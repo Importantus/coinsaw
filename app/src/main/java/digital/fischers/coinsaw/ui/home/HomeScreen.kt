@@ -7,16 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,8 +34,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
-import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.viewModels.HomeViewModel
+import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -74,6 +71,22 @@ fun HomeScreen(
         }
     }) {
         Column {
+            if (groups.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    groups.forEach { group ->
+                        GroupCard(
+                            groupUiState = group,
+                            onClick = { onGroupClicked(group.id) }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -96,14 +109,7 @@ fun HomeScreen(
                         .fillMaxWidth(1f)
                 )
             }
-            if (true) {
-                groups.forEach { group ->
-                    CustomButton(
-                        onClick = { onGroupClicked(group.id) },
-                        text = group.name
-                    )
-                }
-            }
+
             if (groups.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -133,7 +139,6 @@ fun HomeScreen(
                     )
                 }
             }
-
         }
     }
 }
@@ -161,9 +166,9 @@ fun ActionButton(
                 role = Role.Button
             )
             .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 20.dp),
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Icon(
             painter = painterResource(id = icon),
@@ -174,7 +179,7 @@ fun ActionButton(
             text = text,
             modifier = Modifier.padding(end = 8.dp),
             style = TextStyle(
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Normal
             )
         )
@@ -186,17 +191,29 @@ fun GroupCard(
     groupUiState: HomeGroupUiState,
     onClick: (String) -> Unit
 ) {
-    Column {
-        Row {
+    Column(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { onClick(groupUiState.id) }
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column {
                 Text(
                     text = groupUiState.name,
                     style = TextStyle(
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Medium,
                         color = Color.White
                     )
                 )
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "${groupUiState.members} ${
                         if (groupUiState.members == 1) stringResource(
@@ -216,8 +233,32 @@ fun GroupCard(
                     )
                 )
             }
-            Box {
-                Text(text = "${groupUiState.balance} ${groupUiState.currency}")
+            Box(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .background(
+                        when {
+                            groupUiState.balance > 0.0 -> MaterialTheme.colorScheme.secondaryContainer
+                            groupUiState.balance < 0.0 -> MaterialTheme.colorScheme.error
+                            else -> MaterialTheme.colorScheme.secondary
+                        }
+                    )
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = "${
+                        String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            groupUiState.balance
+                        )
+                    } ${groupUiState.currency}",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.surface
+                    )
+                )
             }
         }
     }
