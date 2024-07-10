@@ -2,24 +2,24 @@ package digital.fischers.coinsaw.ui.utils
 
 sealed class CreateUiStates {
     data class Group(
-        var name: String = "",
-        var currency: String = ""
+        val name: String = "",
+        val currency: String = ""
     )
 
     data class  User(
-        var name: String = "",
-        var isMe: Boolean = false
+        val name: String = "",
+        val isMe: Boolean = false
     )
 
     data class Bill(
-        var name: String = "",
-        var amount: Double = 0.0,
-        var payerId: String = "",
-        var splitting: List<Splitting> = emptyList()
+        val name: String = "",
+        val amount: Double = 0.0,
+        val payerId: String = "",
+        val splitting: List<Splitting> = emptyList()
     )
 
     data class Splitting(
-        var userId: String = "",
-        var percentage: Double = 0.0
+        val userId: String = "",
+        val percentage: Double = 0.0
     )
 }
