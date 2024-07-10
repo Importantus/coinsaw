@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name" translatable="false">Coinsaw</string>
+    <string name="unknown_user">Unknown</string>
+    <string name="screen_title_groups">My Groups</string>
+    <string name="no_groups_yet">You have no groups yet. Join or create one!</string>
+    <string name="add_group">Create Group</string>
+    <string name="join_group">Join Group</string>
+    <string name="screen_settings_title">Settings</string>
+    <string name="cancel">Cancel</string>
+    <string name="next_step">Next Step</string>
+    <string name="groupname">Groupname</string>
+    <string name="groupname_placeholder">Household</string>
+    <string name="screen_newgroup_title">Create your group</string>
+    <string name="currency">Currency</string>
+    <string name="currency_description">The currency across your group</string>
+    <string name="currency_placeholder">€</string>
+    <string name="member_singular">member</string>
+    <string name="member_plural">members</string>
+    <string name="online">online</string>
+    <string name="offline">offline</string>
+</resources>

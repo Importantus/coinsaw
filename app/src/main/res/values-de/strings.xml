@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unknown_user">Unbekannt</string>
+    <string name="screen_title_groups">Meine Gruppen</string>
+    <string name="no_groups_yet">Du hast bisher noch keine Gruppen. Erstell doch eine!</string>
+    <string name="add_group">Erstellen</string>
+    <string name="join_group">Beitreten</string>
+    <string name="screen_settings_title">Einstellungen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="next_step">Nächster Schritt</string>
+    <string name="groupname">Name der Gruppe</string>
+    <string name="groupname_placeholder">Haushalt</string>
+    <string name="screen_newgroup_title">Erstelle deine Gruppe</string>
+    <string name="currency">Währung</string>
+    <string name="currency_description">Die Währung deiner Gruppe</string>
+    <string name="currency_placeholder">€</string>
+    <string name="member_singular">Mitglied</string>
+    <string name="member_plural">Mitglieder</string>
+    <string name="online">online</string>
+    <string name="offline">offline</string>
+</resources>
