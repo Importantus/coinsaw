@@ -18,7 +18,7 @@ import digital.fischers.coinsaw.R
 @Composable
 fun CustomNavigationBar(
     title: String,
-    backNavigationText: String,
+    backNavigationText: String?,
     backNavigation: () -> Unit,
     menu: @Composable (() -> Unit)? = null
 ) {
