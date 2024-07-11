@@ -28,6 +28,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.material.textfield.TextInputLayout
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
+import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
+import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.CustomTextField
 import digital.fischers.coinsaw.ui.components.SettingCard
@@ -56,23 +58,16 @@ fun NewGroupScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            CustomFloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
                         val groupId = viewModel.createGroup()
                         onNavigateForward(groupId)
                     }
                 },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_arrow_big_right),
-                    contentDescription = stringResource(
-                        id = R.string.next_step
-                    )
-                )
-            }
+                type = CustomFloatingActionButtonType.NEXT,
+                contentDescription = stringResource(id = R.string.next_step)
+            )
         }
     ) {
         Text(
