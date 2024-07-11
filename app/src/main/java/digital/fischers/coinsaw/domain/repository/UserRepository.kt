@@ -14,5 +14,5 @@ interface UserRepository {
     suspend fun createUser(groupId: String, user: CreateUiStates.User)
     suspend fun updateUser(groupId: String, changes: Payload.User)
 
-    suspend fun setUserAsMe(userId: String)
+    suspend fun setUserAsMe(groupId: String, userId: String, isMeValue: Boolean)
 }

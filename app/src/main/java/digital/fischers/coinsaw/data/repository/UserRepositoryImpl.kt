@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.data.repository
 
+import android.util.Log
 import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.data.database.UserDao
 import digital.fischers.coinsaw.domain.changelog.Entry
@@ -11,6 +12,7 @@ import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID
 import javax.inject.Inject
 
@@ -55,8 +57,10 @@ class UserRepositoryImpl @Inject constructor(
         groupRepository.processEntry(entry)
 
         if(user.isMe) {
-            setUserAsMe(userId)
+            setUserAsMe(groupId, userId, true)
         }
+
+        return
     }
 
     override suspend fun updateUser(groupId: String, changes: Payload.User) {
@@ -73,11 +77,24 @@ class UserRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun setUserAsMe(userId: String) {
-        return userDao.update(
-            userDao.getById(userId).first().copy(
-                isMe = true
+    override suspend fun setUserAsMe(groupId: String, userId: String, isMeValue: Boolean) {
+        // If user is set as "me", set all other users as not me
+        if(isMeValue) {
+            userDao.getByGroupId(groupId).firstOrNull()?.forEach {
+                userDao.update(
+                    it.copy(
+                        isMe = false
+                    )
+                )
+            }
+        }
+
+        userDao.getById(userId).firstOrNull()?.copy(
+            isMe = isMeValue
+        )?.let {
+            userDao.update(
+                it
             )
-        )
+        }
     }
 }
