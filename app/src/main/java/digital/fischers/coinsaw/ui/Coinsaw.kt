@@ -17,10 +17,13 @@ fun CoinsawApp(
     appState: CoinsawAppState = rememberCoinsawAppState()
 ) {
     NavHost(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
         navController = appState.navController,
         startDestination = Screen.Home.route,
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
+//        enterTransition = { EnterTransition.None },
+//        exitTransition = { ExitTransition.None }
     ) {
         composable(Screen.Home.route) {
             HomeScreen(
