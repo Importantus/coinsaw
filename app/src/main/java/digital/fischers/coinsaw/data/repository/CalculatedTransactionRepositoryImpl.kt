@@ -7,6 +7,7 @@ import digital.fischers.coinsaw.data.util.calculateTransactions
 import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.reduce
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class CalculatedTransactionRepositoryImpl @Inject constructor(
 
     override suspend fun calculateForGroup(groupId: String) {
         billDao.getAllBillsByGroupAndIsDeleted(groupId, isDeleted = false)
-            .collect { bills ->
+            .first().let { bills ->
                 insertAll(calculateTransactions(bills, groupId))
             }
     }
