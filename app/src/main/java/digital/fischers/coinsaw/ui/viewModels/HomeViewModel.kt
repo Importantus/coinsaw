@@ -1,6 +1,5 @@
 package digital.fischers.coinsaw.ui.viewModels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,6 @@ import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.home.HomeGroupUiState
 import digital.fischers.coinsaw.ui.home.HomeTransactionUiState
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -69,10 +67,4 @@ class HomeViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = emptyList()
     )
-
-//    val groups = groupRepository.getAllGroupsStream().stateIn(
-//        scope = viewModelScope,
-//        started = SharingStarted.WhileSubscribed(5_000L),
-//        initialValue = emptyList()
-//    )
 }
