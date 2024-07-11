@@ -18,4 +18,15 @@
     <string name="member_plural">members</string>
     <string name="online">online</string>
     <string name="offline">offline</string>
+    <string name="add_bill">Create spending</string>
+    <string name="screen_group_title">Group</string>
+    <string name="group_no_members_error">There are no members yet! Create one to get started!</string>
+    <string name="add_member">Add member</string>
+    <string name="screen_first_member_title">Add your first member</string>
+    <string name="member_name">Name</string>
+    <string name="member_name_placeholder">Ulrich</string>
+    <string name="member_is_user_form_label">That\'s me</string>
+    <string name="screen_memberlist_title">Members</string>
+    <string name="you">You</string>
+    <string name="screen_edit_member_title">Edit member</string>
 </resources>
