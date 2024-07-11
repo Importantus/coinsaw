@@ -27,8 +27,8 @@ interface UserDao {
     fun getByGroupIdAndIsDeleted(groupId: String, isDeleted: Boolean): Flow<List<User>>
 
     @Insert
-    fun insert(user: User)
+    suspend fun insert(user: User)
 
     @Update
-    fun update(user: User)
+    suspend fun update(user: User)
 }
