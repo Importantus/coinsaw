@@ -14,15 +14,12 @@ import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.changelog.EntryAction
 import digital.fischers.coinsaw.domain.changelog.EntryType
 import digital.fischers.coinsaw.domain.changelog.Payload
-import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
-import digital.fischers.coinsaw.domain.repository.ChangelogRepository
 import digital.fischers.coinsaw.domain.repository.GroupRepository
-import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.InvalidPropertiesFormatException
 import java.util.UUID
 import javax.inject.Inject
@@ -52,7 +49,7 @@ class GroupRepositoryImpl @Inject constructor(
 
     override suspend fun processEntry(changeEntry: Entry) {
         // If changelog with this ID already exists, do nothing
-        if (changelogDao.getEntry(changeEntry.id).count() > 0) {
+        if (changelogDao.getEntry(changeEntry.id).firstOrNull() != null) {
             return
         }
 
@@ -175,6 +172,7 @@ class GroupRepositoryImpl @Inject constructor(
         if (group.online && group.lastSync != null && changeEntry.syncTimestamp == null) {
             syncGroup(groupId)
         }
+
     }
 
     override suspend fun updateGroup(groupId: String, changes: Payload.GroupSettings) {
