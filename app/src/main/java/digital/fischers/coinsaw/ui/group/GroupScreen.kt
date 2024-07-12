@@ -110,7 +110,10 @@ fun GroupScreen(
                             text = {
                                 Text(text = stringResource(id = R.string.screen_memberlist_title))
                             },
-                            onClick = { onGroupMembersClicked(groupId) },
+                            onClick = {
+                                onGroupMembersClicked(groupId)
+                                menuExpanded = false
+                            },
                             colors = MenuDefaults.itemColors(
                                 textColor = MaterialTheme.colorScheme.onBackground
                             )
