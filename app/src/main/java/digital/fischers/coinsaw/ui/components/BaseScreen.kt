@@ -28,6 +28,8 @@ import digital.fischers.coinsaw.R
 fun BaseScreen(
     floatingActionButton: @Composable (() -> Unit)? = null,
     horizontalPadding: Int = 16,
+    contentPaddingEnabled: Boolean = true,
+    topColor: Color? = null,
     nonBlockingLoading: Boolean = false,
     blockingLoading: Boolean = false,
     title: String? = null,
@@ -42,6 +44,7 @@ fun BaseScreen(
             topBar = {
                 Box(
                     modifier = Modifier
+                        .background(topColor ?: MaterialTheme.colorScheme.background)
                         .windowInsetsPadding(WindowInsets.statusBars)
                         .fillMaxWidth()
                         .padding(
@@ -61,7 +64,7 @@ fun BaseScreen(
             Column(
                 modifier = Modifier
                     .padding(contentPadding)
-                    .padding(horizontal = horizontalPadding.dp)
+                    .padding(horizontal = if(contentPaddingEnabled) horizontalPadding.dp else 0.dp)
             ) {
                 if(title != null) {
                     Text(
