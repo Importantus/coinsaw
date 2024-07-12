@@ -48,13 +48,13 @@ class BillRepositoryImpl @Inject constructor(
             payload = Payload.Bill(
                 id = UUID.randomUUID().toString(),
                 name = bill.name,
-                amount = bill.amount,
+                amount = bill.amount.toDouble(),
                 isDeleted = false,
                 payerId = bill.payerId,
                 participants = bill.splitting.map {
                     Payload.Participant(
                         userId = it.userId,
-                        percentage = it.percentage
+                        percentage = it.percentage.toDouble() / 100
                     )
                 }
             )

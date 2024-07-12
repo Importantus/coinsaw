@@ -13,13 +13,13 @@ sealed class CreateUiStates {
 
     data class Bill(
         val name: String = "",
-        val amount: Double = 0.0,
+        val amount: String = "",
         val payerId: String = "",
         val splitting: List<Splitting> = emptyList()
     )
 
     data class Splitting(
         val userId: String = "",
-        val percentage: Double = 0.0
+        val percentage: String = ""
     )
 }
