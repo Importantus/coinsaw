@@ -10,7 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.domain.changelog.Payload
 import digital.fischers.coinsaw.domain.repository.UserRepository
-import digital.fischers.wisesplitpocv2.ui.Screen
+import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject

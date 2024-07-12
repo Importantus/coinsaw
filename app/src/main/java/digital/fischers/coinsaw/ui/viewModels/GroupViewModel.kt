@@ -9,7 +9,7 @@ import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepositor
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.group.GroupScreenUiStates
-import digital.fischers.wisesplitpocv2.ui.Screen
+import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn

@@ -23,9 +23,6 @@ import digital.fischers.coinsaw.ui.home.HomeScreen
 import digital.fischers.coinsaw.ui.members.AddMemberScreen
 import digital.fischers.coinsaw.ui.members.EditMemberScreen
 import digital.fischers.coinsaw.ui.members.MemberlistScreen
-import digital.fischers.wisesplitpocv2.ui.CoinsawAppState
-import digital.fischers.wisesplitpocv2.ui.Screen
-import digital.fischers.wisesplitpocv2.ui.rememberCoinsawAppState
 
 @Composable
 fun CoinsawApp(

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
-import digital.fischers.wisesplitpocv2.ui.Screen
+import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject

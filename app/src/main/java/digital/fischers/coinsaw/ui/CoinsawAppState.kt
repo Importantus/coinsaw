@@ -1,4 +1,4 @@
-package digital.fischers.wisesplitpocv2.ui
+package digital.fischers.coinsaw.ui
 
 import android.content.Context
 import androidx.compose.runtime.Composable

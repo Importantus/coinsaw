@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.domain.repository.UserRepository
-import digital.fischers.wisesplitpocv2.ui.Screen
+import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
