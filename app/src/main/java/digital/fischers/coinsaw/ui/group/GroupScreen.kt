@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,9 +45,11 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
+import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
+import kotlinx.coroutines.delay
 
 /**
  * Group screen.
@@ -95,7 +98,7 @@ fun GroupScreen(
                         onDismissRequest = { menuExpanded = false },
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surface),
-                        ) {
+                    ) {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
@@ -147,58 +150,68 @@ fun GroupScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (members.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.7f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .size(300.dp),
-                    painter = painterResource(
-                        id = R.drawable.sprintingdoodle
-                    ),
-                    contentDescription = stringResource(
-                        id = R.string.no_groups_yet
-                    )
-                )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f),
-                    text = stringResource(id = R.string.group_no_members_error),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
-                    )
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Button(onClick = { onAddMemberClicked(groupId) }) {
+        ContentWrapperWithFallback(
+            members,
+            showCondition = members.isNotEmpty(),
+            fallback = {
+                NoMembers(onAddMemberClicked = { onAddMemberClicked(groupId) })
+            }) {
+            Column {
+                members.forEach { member ->
                     Text(
-                        text = stringResource(id = R.string.add_member), style = TextStyle(
+                        text = member.name,
+                        style = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.background
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     )
                 }
             }
-        } else {
-            members.forEach { member ->
-                Text(
-                    text = member.name,
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+        }
+    }
+}
+
+@Composable
+fun NoMembers(onAddMemberClicked: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.7f),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .size(300.dp),
+            painter = painterResource(
+                id = R.drawable.sprintingdoodle
+            ),
+            contentDescription = stringResource(
+                id = R.string.no_groups_yet
+            )
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(0.6f),
+            text = stringResource(id = R.string.group_no_members_error),
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(onClick = { onAddMemberClicked() }) {
+            Text(
+                text = stringResource(id = R.string.add_member), style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.background
                 )
-            }
+            )
         }
     }
 }

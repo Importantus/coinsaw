@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
+import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.viewModels.HomeViewModel
 import java.util.Locale
 
@@ -49,18 +50,14 @@ fun HomeScreen(
 
     BaseScreen(appBar = {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
-                    text = stringResource(id = R.string.screen_title_groups),
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                    text = stringResource(id = R.string.screen_title_groups), style = TextStyle(
+                        fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White
                     )
                 )
             }
@@ -71,48 +68,12 @@ fun HomeScreen(
             )
         }
     }) {
-        Column {
-            if (groups.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(groups.size) {
-                        val group = groups[it]
-                        GroupCard(
-                            groupUiState = group,
-                            onClick = { onGroupClicked(group.id) }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                ActionButton(
-                    left = false,
-                    icon = R.drawable.icon_join,
-                    text = stringResource(id = R.string.join_group),
-                    onClick = onGroupJoinClicked,
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
+        ContentWrapperWithFallback(groups, showCondition = groups.isNotEmpty(), fallback = {
+            Column {
+                ActionButtonRow(
+                    onGroupAddClicked = onGroupAddClicked, onGroupJoinClicked = onGroupJoinClicked
                 )
-                ActionButton(
-                    left = true,
-                    icon = R.drawable.icon_add,
-                    text = stringResource(id = R.string.add_group),
-                    onClick = onGroupAddClicked,
-                    modifier = Modifier
-                        .fillMaxWidth(1f)
-                )
-            }
 
-            if (groups.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -132,8 +93,7 @@ fun HomeScreen(
                         )
                     )
                     Text(
-                        text = stringResource(id = R.string.no_groups_yet),
-                        style = TextStyle(
+                        text = stringResource(id = R.string.no_groups_yet), style = TextStyle(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onBackground
@@ -141,7 +101,48 @@ fun HomeScreen(
                     )
                 }
             }
+        }) {
+            Column {
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(groups.size) {
+                        val group = groups[it]
+                        GroupCard(groupUiState = group, onClick = { onGroupClicked(group.id) })
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                ActionButtonRow(
+                    onGroupAddClicked = onGroupAddClicked, onGroupJoinClicked = onGroupJoinClicked
+                )
+            }
         }
+
+
+    }
+}
+
+@Composable
+fun ActionButtonRow(onGroupAddClicked: () -> Unit, onGroupJoinClicked: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        ActionButton(
+            left = false,
+            icon = R.drawable.icon_join,
+            text = stringResource(id = R.string.join_group),
+            onClick = onGroupJoinClicked,
+            modifier = Modifier.fillMaxWidth(0.5f)
+        )
+        ActionButton(
+            left = true,
+            icon = R.drawable.icon_add,
+            text = stringResource(id = R.string.add_group),
+            onClick = onGroupAddClicked,
+            modifier = Modifier.fillMaxWidth(1f)
+        )
     }
 }
 
@@ -158,14 +159,12 @@ fun ActionButton(
         modifier = modifier
             .clip(
                 if (left) RoundedCornerShape(
-                    topEnd = cornerRadius.dp,
-                    bottomEnd = cornerRadius.dp
+                    topEnd = cornerRadius.dp, bottomEnd = cornerRadius.dp
                 ) else RoundedCornerShape(topStart = cornerRadius.dp, bottomStart = cornerRadius.dp)
             )
 
             .clickable(
-                onClick = onClick,
-                role = Role.Button
+                onClick = onClick, role = Role.Button
             )
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 16.dp),
@@ -178,11 +177,8 @@ fun ActionButton(
             tint = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = text,
-            modifier = Modifier.padding(end = 8.dp),
-            style = TextStyle(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Normal
+            text = text, modifier = Modifier.padding(end = 8.dp), style = TextStyle(
+                fontSize = 18.sp, fontWeight = FontWeight.Normal
             )
         )
     }
@@ -190,17 +186,14 @@ fun ActionButton(
 
 @Composable
 fun GroupCard(
-    groupUiState: HomeGroupUiState,
-    onClick: (String) -> Unit
+    groupUiState: HomeGroupUiState, onClick: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.medium)
-            .clickable { onClick(groupUiState.id) }
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(16.dp)
-    ) {
+    Column(modifier = Modifier
+        .clip(MaterialTheme.shapes.medium)
+        .clickable { onClick(groupUiState.id) }
+        .fillMaxWidth()
+        .background(MaterialTheme.colorScheme.surface)
+        .padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -208,11 +201,8 @@ fun GroupCard(
         ) {
             Column {
                 Text(
-                    text = groupUiState.name,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White
+                    text = groupUiState.name, style = TextStyle(
+                        fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Color.White
                     )
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -227,8 +217,7 @@ fun GroupCard(
                         ) else stringResource(
                             id = R.string.offline
                         )
-                    }",
-                    style = TextStyle(
+                    }", style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onBackground
@@ -250,12 +239,9 @@ fun GroupCard(
                 Text(
                     text = "${
                         String.format(
-                            Locale.getDefault(),
-                            "%.2f",
-                            groupUiState.balance
+                            Locale.getDefault(), "%.2f", groupUiState.balance
                         )
-                    } ${groupUiState.currency}",
-                    style = TextStyle(
+                    } ${groupUiState.currency}", style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.surface
