@@ -29,4 +29,8 @@
     <string name="screen_memberlist_title">Mitglieder</string>
     <string name="you">Du</string>
     <string name="screen_edit_member_title">Mitglied bearbeiten</string>
+    <string name="screen_add_expense_title">Ausgabe hinzufügen</string>
+    <string name="add_expense_user_payed">bezahlte</string>
+    <string name="add_expense_title_placeholder">Titel</string>
+    <string name="add_expense_percent_remaining">Verbleibende Prozente</string>
 </resources>

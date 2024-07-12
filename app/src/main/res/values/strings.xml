@@ -29,4 +29,8 @@
     <string name="screen_memberlist_title">Members</string>
     <string name="you">You</string>
     <string name="screen_edit_member_title">Edit member</string>
+    <string name="screen_add_expense_title">Add Expense</string>
+    <string name="add_expense_user_payed">payed</string>
+    <string name="add_expense_title_placeholder">Add title</string>
+    <string name="add_expense_percent_remaining">Percent remaining</string>
 </resources>
