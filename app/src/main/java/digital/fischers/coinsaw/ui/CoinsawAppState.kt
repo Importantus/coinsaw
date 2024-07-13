@@ -68,52 +68,56 @@ class CoinsawAppState(
     val navController: NavHostController,
     private val context: Context
 ) {
-    fun navigateHome() {
-        if(navController.previousBackStackEntry?.destination?.route != Screen.Home.route) {
-            navController.navigate(Screen.Home.route)
+    private fun navigateBackstackAware(route: String) {
+        if(navController.previousBackStackEntry?.destination?.route != route) {
+            navController.navigate(route)
         } else {
             navController.popBackStack()
         }
     }
 
+    fun navigateHome() {
+        navigateBackstackAware(Screen.Home.route)
+    }
+
     fun navigateToGroup(groupId: String) {
-        navController.navigate(Screen.Group.createRoute(groupId))
+        navigateBackstackAware(Screen.Group.createRoute(groupId))
     }
 
     fun navigateToGroupSettings(groupId: String) {
-        navController.navigate(Screen.GroupSettings.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupSettings.createRoute(groupId))
     }
 
     fun navigateToGroupMemberList(groupId: String) {
-        navController.navigate(Screen.GroupMemberList.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupMemberList.createRoute(groupId))
     }
 
     fun navigateToGroupCreateMember(groupId: String) {
-        navController.navigate(Screen.GroupCreateMember.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupCreateMember.createRoute(groupId))
     }
 
     fun navigateToGroupEditMember(groupId: String, userId: String) {
-        navController.navigate(Screen.GroupEditMember.createRoute(groupId, userId))
+        navigateBackstackAware(Screen.GroupEditMember.createRoute(groupId, userId))
     }
 
     fun navigateToAddBill(groupId: String) {
-        navController.navigate(Screen.AddBill.createRoute(groupId))
+        navigateBackstackAware(Screen.AddBill.createRoute(groupId))
     }
 
     fun navigateToNewGroupName() {
-        navController.navigate(Screen.NewGroupSettings.route)
+        navigateBackstackAware(Screen.NewGroupSettings.route)
     }
 
     fun navigateToNewGroupCreateMember(groupId: String) {
-        navController.navigate(Screen.NewGroupCreateMember.createRoute(groupId))
+        navigateBackstackAware(Screen.NewGroupCreateMember.createRoute(groupId))
     }
 
     fun navigateToNewGroupMemberList(groupId: String) {
-        navController.navigate(Screen.NewGroupMemberList.createRoute(groupId))
+        navigateBackstackAware(Screen.NewGroupMemberList.createRoute(groupId))
     }
 
     fun navigateToNewGroupEditMember(groupId: String, userId: String) {
-        navController.navigate(Screen.NewGroupEditMember.createRoute(groupId, userId))
+        navigateBackstackAware(Screen.NewGroupEditMember.createRoute(groupId, userId))
     }
 
     fun navigateBack() {
