@@ -13,6 +13,7 @@ import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
 
@@ -33,6 +34,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserByGroupIdAndIsMeStream(groupId: String, isMe: Boolean): Flow<User?> {
         return userDao.getByGroupIdAndIsMe(groupId, isMe)
+    }
+
+    override fun getMeOrFirstUserByGroupIdStream(groupId: String): Flow<User?> {
+        return userDao.getByGroupIdAndIsMe(groupId, true).map { user ->
+            user ?: userDao.getByGroupId(groupId).firstOrNull()?.firstOrNull()
+        }
     }
 
     override fun getUserStream(userId: String): Flow<User?> {

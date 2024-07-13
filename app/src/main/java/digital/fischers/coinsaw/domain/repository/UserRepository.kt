@@ -9,6 +9,7 @@ interface UserRepository {
     fun getAllUsersByGroupIdStream(groupId: String): Flow<List<User>>
     fun getUsersByGroupIdAndIsDeletedStream(groupId: String, isDeleted: Boolean): Flow<List<User>>
     fun getUserByGroupIdAndIsMeStream(groupId: String, isMe: Boolean): Flow<User?>
+    fun getMeOrFirstUserByGroupIdStream(groupId: String): Flow<User?>
     fun getUserStream(userId: String): Flow<User?>
 
     suspend fun createUser(groupId: String, user: CreateUiStates.User)

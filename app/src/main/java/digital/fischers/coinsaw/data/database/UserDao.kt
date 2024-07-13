@@ -18,7 +18,7 @@ interface UserDao {
     fun getByName(name: String): Flow<User>
 
     @Query("SELECT * FROM user WHERE groupId = :groupId AND isMe = :isMe")
-    fun getByGroupIdAndIsMe(groupId: String, isMe: Boolean): Flow<User>
+    fun getByGroupIdAndIsMe(groupId: String, isMe: Boolean): Flow<User?>
 
     @Query("SELECT * FROM user WHERE groupId = :groupId")
     fun getByGroupId(groupId: String): Flow<List<User>>
