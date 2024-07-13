@@ -2,6 +2,7 @@ package digital.fischers.coinsaw.data.util
 
 import digital.fischers.coinsaw.data.database.Bill
 import digital.fischers.coinsaw.data.database.CalculatedTransaction
+import java.math.RoundingMode
 import java.util.UUID
 
 fun calculateTransactions(transactions: List<Bill>, groupId: String): List<CalculatedTransaction> {
@@ -35,7 +36,7 @@ fun calculateTransactions(transactions: List<Bill>, groupId: String): List<Calcu
         adjustedTransactions.add(CalculatedTransaction(
             id = UUID.randomUUID().toString(),
             groupId = groupId,
-            amount = transactionAmount,
+            amount = transactionAmount.toBigDecimal().setScale(2, RoundingMode.HALF_UP).toDouble(),
             payerId = owee,
             payeeId = spender
         ))
