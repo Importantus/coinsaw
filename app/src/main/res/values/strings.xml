@@ -33,4 +33,5 @@
     <string name="add_expense_user_payed">payed</string>
     <string name="add_expense_title_placeholder">Add title</string>
     <string name="add_expense_percent_remaining">Percent remaining</string>
+    <string name="add_expense_save">Save Expense</string>
 </resources>
