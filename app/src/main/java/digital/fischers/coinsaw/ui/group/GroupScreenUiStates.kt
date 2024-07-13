@@ -29,7 +29,7 @@ sealed class GroupScreenUiStates {
 
     data class CalculatedTransaction(
         val amount: Double = 0.0,
-        val payer: Flow<User>,
+        val payer: StateFlow<User>,
         val payee: StateFlow<User>
     )
 }
