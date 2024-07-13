@@ -6,14 +6,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
@@ -49,7 +47,6 @@ import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
-import kotlinx.coroutines.delay
 
 /**
  * Group screen.
@@ -77,6 +74,8 @@ fun GroupScreen(
 ) {
     val group by groupViewModel.group.collectAsState()
     val members by groupViewModel.members.collectAsState()
+    val bills by groupViewModel.bills.collectAsState()
+    val calculatedTransactions by groupViewModel.calculatedTransactions.collectAsState()
     val groupId = groupViewModel.groupId
 
     var menuExpanded by remember { mutableStateOf(false) }
@@ -160,6 +159,19 @@ fun GroupScreen(
                 NoMembers(onAddMemberClicked = { onAddMemberClicked(groupId) })
             }) {
             Column {
+                calculatedTransactions.forEach { transaction ->
+                    val payer by transaction.payer.collectAsState()
+                    val payee by transaction.payee.collectAsState()
+                    CalculatedTransactionElement(
+                        currency = group.currency,
+                        amount = transaction.amount,
+                        payer = payer.name,
+                        payee = payee.name,
+                        payerIsMe = payer.isMe,
+                        onClick = { onAddTransactionClicked(groupId) }
+                    )
+                }
+
                 members.forEach { member ->
                     Text(
                         text = member.name,
@@ -170,8 +182,164 @@ fun GroupScreen(
                         )
                     )
                 }
+
+                bills.forEach { bill ->
+                    val payer by bill.payer.collectAsState()
+                    Text(
+                        text = "Bill: ${bill.name} payed by ${payer.name}",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    )
+
+                }
             }
         }
+    }
+}
+
+@Composable
+fun CalculatedTransactionElement(
+    currency: String,
+    amount: Double,
+    payer: String,
+    payee: String,
+    payerIsMe: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .clickable { onClick() }
+    ) {
+        if(payerIsMe) {
+            Column(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.secondary)
+                    .fillMaxWidth(),
+            ) {
+                BaseCalculatedTransactionElement(
+                    currency = currency,
+                    amount = amount,
+                    payer = payer,
+                    payee = payee,
+                    highlighted = true,
+                    iconBackground = MaterialTheme.colorScheme.secondary
+                )
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .fillMaxWidth()
+                        .padding(3.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(end = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.settle_up_specifically),
+                            style = TextStyle(
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_double_arrow_right),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            BaseCalculatedTransactionElement(
+                currency = currency,
+                amount = amount,
+                payer = payer,
+                payee = payee,
+                highlighted = false,
+                iconBackground = MaterialTheme.colorScheme.surface
+            )
+        }
+    }
+}
+
+@Composable
+fun BaseCalculatedTransactionElement(
+    currency: String,
+    amount: Double,
+    payer: String,
+    payee: String,
+    highlighted: Boolean,
+    iconBackground: Color,
+    modifier: Modifier = Modifier
+) {
+    val textColor = if (highlighted) Color.White else MaterialTheme.colorScheme.onBackground
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .background(iconBackground)
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_money),
+                    contentDescription = null,
+                    tint = if(highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = payer, style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = textColor
+                    )
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_double_arrow_right),
+                    contentDescription = null,
+                    tint = textColor
+                )
+                Text(
+                    text = payee, style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = textColor
+                    )
+                )
+            }
+        }
+        Text(
+            text = "$amount $currency",
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal,
+                color = textColor
+            )
+        )
     }
 }
 
