@@ -34,4 +34,5 @@
     <string name="add_expense_title_placeholder">Titel</string>
     <string name="add_expense_percent_remaining">Verbleibende Prozente</string>
     <string name="add_expense_save">Ausgabe speichern</string>
+    <string name="settle_up_specifically">Zahle das zurück</string>
 </resources>
