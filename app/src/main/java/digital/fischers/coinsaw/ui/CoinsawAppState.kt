@@ -96,7 +96,7 @@ class CoinsawAppState(
         navController.navigate(Screen.GroupEditMember.createRoute(groupId, userId))
     }
 
-    fun navigateToAddItem(groupId: String) {
+    fun navigateToAddBill(groupId: String) {
         navController.navigate(Screen.AddBill.createRoute(groupId))
     }
 

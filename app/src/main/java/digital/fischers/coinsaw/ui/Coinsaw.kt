@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import digital.fischers.coinsaw.ui.bill.AddBillScreen
 import digital.fischers.coinsaw.ui.group.GroupScreen
 import digital.fischers.coinsaw.ui.group.NewGroupScreen
 import digital.fischers.coinsaw.ui.home.HomeScreen
@@ -138,8 +139,12 @@ fun CoinsawApp(
                     onAddMemberClicked = {
                         appState.navigateToGroupCreateMember(it)
                     },
-                    onBillClicked = {},
-                    onAddBillClicked = {},
+                    onBillClicked = {
+
+                    },
+                    onAddBillClicked = {
+                        appState.navigateToAddBill(it)
+                    },
                     onAddTransactionClicked = {},
                     onSettleUpClicked = {})
             }
@@ -162,6 +167,14 @@ fun CoinsawApp(
 
             composable(Screen.GroupEditMember.route) {
                 EditMemberScreen(onBackNavigation = { appState.navigateBack() })
+            }
+
+            composable(Screen.AddBill.route) {
+                AddBillScreen(onBackNavigation = {
+                    appState.navigateToGroup(it)
+                }, onForwardNavigation = {
+                    appState.navigateToGroup(it)
+                })
             }
         }
     }
