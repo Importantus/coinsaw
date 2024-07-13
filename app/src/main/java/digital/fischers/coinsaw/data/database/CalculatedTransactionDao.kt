@@ -34,4 +34,7 @@ interface CalculatedTransactionDao {
 
     @Query("DELETE FROM calculated_transactions WHERE id = :id")
     suspend fun delete(id: String)
+
+    @Query("DELETE FROM calculated_transactions WHERE groupId = :groupId")
+    suspend fun deleteAllByGroupId(groupId: String)
 }

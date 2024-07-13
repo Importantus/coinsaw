@@ -41,6 +41,8 @@ class CalculatedTransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun calculateForGroup(groupId: String) {
+        calculatedTransactionDao.deleteAllByGroupId(groupId)
+
         billDao.getAllBillsByGroupAndIsDeleted(groupId, isDeleted = false)
             .first().let { bills ->
                 insertAll(calculateTransactions(bills, groupId))
