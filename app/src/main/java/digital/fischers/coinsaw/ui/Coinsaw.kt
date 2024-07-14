@@ -139,14 +139,19 @@ fun CoinsawApp(
                     onAddMemberClicked = {
                         appState.navigateToGroupCreateMember(it)
                     },
-                    onBillClicked = {
+                    onBillClicked = { groupId, billId ->
 
                     },
                     onAddBillClicked = {
                         appState.navigateToAddBill(it)
                     },
-                    onAddTransactionClicked = {},
-                    onSettleUpClicked = {})
+                    onAddTransactionClicked = { groupId, amount, payer, payee ->
+
+                    },
+                    onSettleUpClicked = {},
+                    onTransactionClicked = { groupId, transactionId ->
+
+                    })
             }
 
             composable(Screen.GroupCreateMember.route) {

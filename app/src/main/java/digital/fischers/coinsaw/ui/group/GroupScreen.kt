@@ -1,20 +1,25 @@
 package digital.fischers.coinsaw.ui.group
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -47,6 +52,10 @@ import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
+import kotlinx.coroutines.flow.StateFlow
+import java.util.Date
+import java.util.Locale
+import kotlin.math.abs
 
 /**
  * Group screen.
@@ -66,9 +75,10 @@ fun GroupScreen(
     onGroupSettingsClicked: (String) -> Unit,
     onGroupMembersClicked: (String) -> Unit,
     onAddMemberClicked: (String) -> Unit,
-    onBillClicked: (String) -> Unit,
-    onAddBillClicked: (String) -> Unit,
-    onAddTransactionClicked: (String) -> Unit,
+    onBillClicked: (groupId: String, billId: String) -> Unit,
+    onAddBillClicked: (groupId: String) -> Unit,
+    onAddTransactionClicked: (groupId: String, amount: String?, payer: String?, payee: String?) -> Unit,
+    onTransactionClicked: (groupId: String, billId: String) -> Unit,
     onSettleUpClicked: (String) -> Unit,
     groupViewModel: GroupViewModel = hiltViewModel()
 ) {
@@ -158,42 +168,94 @@ fun GroupScreen(
             fallback = {
                 NoMembers(onAddMemberClicked = { onAddMemberClicked(groupId) })
             }) {
-            Column {
-                calculatedTransactions.forEach { transaction ->
-                    val payer by transaction.payer.collectAsState()
-                    val payee by transaction.payee.collectAsState()
-                    CalculatedTransactionElement(
-                        currency = group.currency,
-                        amount = transaction.amount,
-                        payer = payer.name,
-                        payee = payee.name,
-                        payerIsMe = payer.isMe,
-                        onClick = { onAddTransactionClicked(groupId) }
-                    )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                item {
+                    calculatedTransactions.forEach { transaction ->
+                        val payer by transaction.payer.collectAsState()
+                        if (payer.isMe) {
+                            val payee by transaction.payee.collectAsState()
+                            CalculatedTransactionElement(
+                                currency = group.currency,
+                                amount = transaction.amount,
+                                payer = payer.name,
+                                payee = payee.name,
+                                payerIsMe = true,
+                                onClick = {
+                                    onAddTransactionClicked(
+                                        groupId,
+                                        transaction.id,
+                                        payer.id,
+                                        payee.id
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        calculatedTransactions.forEach { transaction ->
+                            val payer by transaction.payer.collectAsState()
+                            if (!payer.isMe) {
+                                val payee by transaction.payee.collectAsState()
+                                CalculatedTransactionElement(
+                                    currency = group.currency,
+                                    amount = transaction.amount,
+                                    payer = payer.name,
+                                    payee = payee.name,
+                                    payerIsMe = false,
+                                    onClick = {
+                                        onAddTransactionClicked(
+                                            groupId,
+                                            transaction.id,
+                                            payer.id,
+                                            payee.id
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
 
-                members.forEach { member ->
-                    Text(
-                        text = member.name,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Divider(
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                bills.forEach { bill ->
-                    val payer by bill.payer.collectAsState()
-                    Text(
-                        text = "Bill: ${bill.name} payed by ${payer.name}",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    )
-
+                items(count = bills.size) { index ->
+                    val bill = bills[index]
+                    BaseTimeLineElement(
+                        bill.created
+                    ) {
+                        if (bill.name.isBlank() && bill.splitting.size == 1) {
+                            TransactionElement(
+                                currency = group.currency,
+                                payer = bill.payer,
+                                amount = bill.amount,
+                                payee = bill.splitting.first().user,
+                                onClick = { onTransactionClicked(groupId, bill.id) }
+                            )
+                        } else {
+                            BillElement(
+                                currency = group.currency,
+                                name = bill.name,
+                                amount = bill.amount,
+                                payer = bill.payer,
+                                myShare = bill.myShare,
+                                onClick = { onBillClicked(groupId, bill.id) }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -212,12 +274,12 @@ fun CalculatedTransactionElement(
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
+        .clip(MaterialTheme.shapes.small)
         .clickable { onClick() }
     ) {
-        if(payerIsMe) {
+        if (payerIsMe) {
             Column(
                 modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
                     .background(MaterialTheme.colorScheme.secondary)
                     .fillMaxWidth(),
             ) {
@@ -303,7 +365,7 @@ fun BaseCalculatedTransactionElement(
                 Icon(
                     painter = painterResource(id = R.drawable.icon_money),
                     contentDescription = null,
-                    tint = if(highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                    tint = if (highlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
@@ -333,7 +395,7 @@ fun BaseCalculatedTransactionElement(
             }
         }
         Text(
-            text = "$amount $currency",
+            text = "%.2f".format(amount) + " $currency",
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
@@ -341,6 +403,169 @@ fun BaseCalculatedTransactionElement(
             )
         )
     }
+}
+
+@Composable
+fun BaseTimeLineElement(
+    timestamp: Long,
+    content: @Composable () -> Unit
+) {
+    val date = Date(timestamp)
+    val verticalPadding = 6
+
+    Row(
+        modifier = Modifier
+            .height(IntrinsicSize.Min)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .width(24.dp)
+                .padding(vertical = verticalPadding.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            var month = DateFormat.format("MMM", date).toString().uppercase(Locale.getDefault())
+
+            if (month.length > 4) {
+                month = month.take(3) + "."
+            }
+
+            Text(
+                text = month,
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
+            Text(
+                text = DateFormat.format("dd", date).toString(),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(1.dp)
+                    .background(MaterialTheme.colorScheme.onSurface)
+            ) {
+                Divider(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1.dp)
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.onBackground)
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = verticalPadding.dp)
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun BillElement(
+    currency: String,
+    name: String,
+    amount: Double,
+    payer: StateFlow<GroupScreenUiStates.User>,
+    myShare: Double?,
+    onClick: () -> Unit
+) {
+    val payerState by payer.collectAsState()
+
+    val byline = if (myShare != null) {
+        "%.2f".format(amount) + " $currency ${stringResource(id = R.string.by)} ${payerState.name}"
+    } else {
+        payerState.name
+    }
+
+    val displayedAmount = myShare ?: amount
+    Row(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.small)
+            .clickable { onClick() }
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = name, style = TextStyle(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+            Text(
+                text = byline,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (myShare != null) {
+                Text(
+                    text = if (displayedAmount > 0) stringResource(id = R.string.you_lent) else stringResource(
+                        id = R.string.you_borrowed
+                    ), style = TextStyle(
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+            }
+            Text(
+                text = "%.2f".format(abs(displayedAmount)) + " " + currency,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    color = if (displayedAmount > 0) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.error
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun TransactionElement(
+    currency: String,
+    payer: StateFlow<GroupScreenUiStates.User>,
+    amount: Double,
+    payee: StateFlow<GroupScreenUiStates.User>,
+    onClick: () -> Unit
+) {
+    Text(text = "TransactionElement yet to be implemented")
 }
 
 @Composable
