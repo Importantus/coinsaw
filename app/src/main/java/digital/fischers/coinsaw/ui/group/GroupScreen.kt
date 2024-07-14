@@ -504,7 +504,15 @@ fun BillElement(
         payerState.name
     }
 
-    val displayedAmount = myShare ?: amount
+    val displayedAmount = if(myShare != null) {
+        if(myShare > 0) {
+            amount - myShare
+        } else {
+            myShare
+        }
+    } else {
+        amount
+    }
     Row(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
