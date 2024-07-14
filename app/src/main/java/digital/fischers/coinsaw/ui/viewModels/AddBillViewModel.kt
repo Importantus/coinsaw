@@ -15,6 +15,7 @@ import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.Screen
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import digital.fischers.coinsaw.ui.utils.formatAsDecimal
+import digital.fischers.coinsaw.ui.utils.roundHalfUp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,9 +57,21 @@ class AddBillViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUsersByGroupIdAndIsDeletedStream(groupId, false).firstOrNull()
                 ?.let { users ->
+                    val total = users.size
+                    val percentPerUser = (100.0 / total).roundHalfUp()
+                    val remainingPercentage = 100.0 - (percentPerUser * total)
+
+                    val randomUserId = users.random().id
+
                     _newBillState.value = newBillState.value.copy(splitting = users.map {
+                        var percent = percentPerUser
+
+                        if (it.id == randomUserId && remainingPercentage >= 0.01) {
+                            percent += remainingPercentage
+                        }
+
                         CreateUiStates.Splitting(
-                            userId = it.id, percentage = ((1.0 / users.size) * 100).toString().formatAsDecimal()
+                            userId = it.id, percentage = percent.toString()
                         )
                     })
                 }
@@ -107,7 +120,7 @@ class AddBillViewModel @Inject constructor(
             }
         })
 
-        percentRemaining = 100.00 - newBillState.value.splitting.sumOf { it.percentage.toDouble() }
+        percentRemaining = 100.0 - newBillState.value.splitting.sumOf { it.percentage.toDouble() }
 
         checkIfValid()
     }
@@ -125,8 +138,7 @@ class AddBillViewModel @Inject constructor(
     }
 
     private fun checkIfSplittingIs100Percent(): Boolean {
-        return newBillState.value.splitting.sumOf { it.percentage.toDouble() } > 99.9 &&
-                newBillState.value.splitting.sumOf { it.percentage.toDouble() } < 100.1
+        return newBillState.value.splitting.sumOf { it.percentage.toDouble() } == 100.0
     }
 
     suspend fun createBill() {
