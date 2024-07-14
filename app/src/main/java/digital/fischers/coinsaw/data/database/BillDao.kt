@@ -8,19 +8,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BillDao {
-    @Query("SELECT * FROM bill WHERE isDeleted = :isDeleted")
+    @Query("SELECT * FROM bill WHERE isDeleted = :isDeleted ORDER BY createdAt DESC")
     fun getAllBills(isDeleted: Boolean = false): Flow<List<Bill>>
 
-    @Query("SELECT * FROM bill WHERE groupId = :groupId")
+    @Query("SELECT * FROM bill WHERE groupId = :groupId ORDER BY createdAt DESC")
     fun getAllBillsByGroup(groupId: String): Flow<List<Bill>>
 
-    @Query("SELECT * FROM bill WHERE groupId = :groupId AND isDeleted = :isDeleted")
+    @Query("SELECT * FROM bill WHERE groupId = :groupId AND isDeleted = :isDeleted ORDER BY createdAt DESC")
     fun getAllBillsByGroupAndIsDeleted(groupId: String, isDeleted: Boolean = false): Flow<List<Bill>>
 
     @Query("SELECT * FROM bill WHERE id = :billId")
     fun getBillById(billId: String): Flow<Bill>
 
-    @Query("SELECT * FROM bill WHERE userId = :userId AND isDeleted = :isDeleted")
+    @Query("SELECT * FROM bill WHERE userId = :userId AND isDeleted = :isDeleted ORDER BY createdAt DESC")
     fun getBillsByUserId(userId: String, isDeleted: Boolean = false): Flow<List<Bill>>
 
     @Insert
