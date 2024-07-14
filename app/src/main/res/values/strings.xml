@@ -35,4 +35,7 @@
     <string name="add_expense_percent_remaining">Percent remaining</string>
     <string name="add_expense_save">Save Expense</string>
     <string name="settle_up_specifically">settle this up</string>
+    <string name="by">by</string>
+    <string name="you_lent">you lent</string>
+    <string name="you_borrowed">you borrowed</string>
 </resources>

@@ -35,4 +35,7 @@
     <string name="add_expense_percent_remaining">Verbleibende Prozente</string>
     <string name="add_expense_save">Ausgabe speichern</string>
     <string name="settle_up_specifically">Zahle das zurück</string>
+    <string name="by">von</string>
+    <string name="you_lent">du leihst</string>
+    <string name="you_borrowed">du leihst dir</string>
 </resources>
