@@ -21,7 +21,7 @@ interface RemoteRepository {
 
     suspend fun deleteShare(groupId: String, shareId: String)
 
-    suspend fun createSession(groupId: String, options: CreateSessionRequest): CreateSessionResponse
+    suspend fun createSession(groupId: String, options: CreateSessionRequest)
 
     suspend fun getAllSessions(groupId: String): List<Session>
 

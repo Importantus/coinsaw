@@ -18,6 +18,7 @@ import digital.fischers.coinsaw.data.remote.Share
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -107,12 +108,18 @@ class RemoteRepositoryImpl @Inject constructor(
     override suspend fun createSession(
         groupId: String,
         options: CreateSessionRequest
-    ): CreateSessionResponse {
+    ) {
         val (_, serverUrl) = getAccessTokenAndServerUrl(groupId)
-        return apiService.createSession(
+        val response = apiService.createSession(
             appendToServerUrl(serverUrl, ApiPath.CREATE_SESSION),
             options
         )
+        groupDao.update(groupDao.getGroup(groupId).first().copy(
+            sessionId = response.id,
+            accessToken = response.token,
+            admin = response.admin,
+            online = true
+        ))
     }
 
     override suspend fun getAllSessions(groupId: String): List<Session> {

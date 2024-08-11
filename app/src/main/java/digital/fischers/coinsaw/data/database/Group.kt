@@ -12,6 +12,7 @@ data class Group(
     val apiEndpoint: String?,
     val admin: Boolean,
     val accessToken: String?,
+    val sessionId: String?,
     val lastSync: Long?,
     val createdAt: Long
 )
