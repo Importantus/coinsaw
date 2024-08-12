@@ -61,6 +61,8 @@ import kotlin.math.abs
  * Group screen.
  * @param onBackNavigation: Navigation back to the previous screen.
  * @param onGroupSettingsClicked: Navigation to the group settings screen.
+ * @param onSharesClicked: Navigation to the shares screen.
+ * @param onMakeOnlineClicked: Navigation to the make online screen.
  * @param onGroupMembersClicked: Navigation to the group members screen.
  * @param onAddMemberClicked: Navigation to the add member screen. This is only available if the group has no members yet.
  * @param onBillClicked: Navigation to the bill details screen.
@@ -73,6 +75,8 @@ import kotlin.math.abs
 fun GroupScreen(
     onBackNavigation: () -> Unit,
     onGroupSettingsClicked: (String) -> Unit,
+    onSharesClicked: (String) -> Unit,
+    onMakeOnlineClicked: (String) -> Unit,
     onGroupMembersClicked: (String) -> Unit,
     onAddMemberClicked: (String) -> Unit,
     onBillClicked: (groupId: String, billId: String) -> Unit,
@@ -127,6 +131,50 @@ fun GroupScreen(
                                 textColor = MaterialTheme.colorScheme.onBackground
                             )
                         )
+
+                        if(!group.isOnline) {
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_upload),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                },
+                                text = {
+                                    Text(text = stringResource(id = R.string.screen_make_online_title))
+                                },
+                                onClick = {
+                                    onMakeOnlineClicked(groupId)
+                                    menuExpanded = false
+                                },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+                        }
+
+                        if(group.isOnline && group.isAdmin) {
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_share),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                },
+                                text = {
+                                    Text(text = stringResource(id = R.string.screen_share_title))
+                                },
+                                onClick = {
+                                    onSharesClicked(groupId)
+                                    menuExpanded = false
+                                },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+                        }
                     }
                 }
             )
@@ -256,6 +304,10 @@ fun GroupScreen(
                             )
                         }
                     }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(42.dp))
                 }
             }
         }

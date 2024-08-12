@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 sealed class GroupScreenUiStates {
     data class Group(
         val name: String = "",
-        val currency: String = ""
+        val currency: String = "",
+        val isOnline: Boolean = false,
+        val isAdmin: Boolean = false,
     )
 
     data class  User(

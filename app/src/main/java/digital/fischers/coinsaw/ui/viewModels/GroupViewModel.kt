@@ -1,5 +1,9 @@
 package digital.fischers.coinsaw.ui.viewModels
 
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,13 +11,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
 import digital.fischers.coinsaw.domain.repository.GroupRepository
+import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.group.GroupScreenUiStates
 import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -23,14 +30,20 @@ class GroupViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val calculatedTransactionRepository: CalculatedTransactionRepository,
     private val billRepository: BillRepository,
+    private val remoteRepository: RemoteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     val groupId: String = savedStateHandle.get<String>(Screen.ARG_GROUP_ID)!!
+
+    var syncError by mutableStateOf(false)
+        private set
 
     val group = groupRepository.getGroupStream(groupId).map { group ->
         GroupScreenUiStates.Group(
             name = group?.name ?: "",
             currency = group?.currency ?: "",
+            isOnline = group?.online ?: false,
+            isAdmin = group?.admin ?: false
         )
     }.stateIn(
         scope = viewModelScope,
@@ -92,6 +105,23 @@ class GroupViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000L),
         initialValue = emptyList()
     )
+
+    init {
+            viewModelScope.launch {
+                val group = groupRepository.getGroupStream(groupId).first()
+                Log.d("GroupViewModel", "Syncing group ${group?.online}")
+                if(group?.online == true) {
+                    try {
+                        Log.d("GroupViewModel", "Syncing group $groupId")
+                        remoteRepository.syncGroup(groupId)
+                        syncError = false
+                    } catch (e: Exception) {
+                        Log.e("GroupViewModel", "Error syncing group $groupId", e)
+                        syncError = true
+                    }
+                }
+            }
+    }
 
     private fun getUserStateFlow(userId: String) = userRepository.getUserStream(userId).map { user ->
         GroupScreenUiStates.User(
