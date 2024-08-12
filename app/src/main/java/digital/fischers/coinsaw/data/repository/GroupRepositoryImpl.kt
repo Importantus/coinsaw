@@ -198,7 +198,8 @@ class GroupRepositoryImpl @Inject constructor(
             lastSync = null,
             admin = true,
             accessToken = null,
-            apiEndpoint = null
+            apiEndpoint = null,
+            sessionId = null
         )
 
         groupDao.insert(newGroup)
