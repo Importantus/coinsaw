@@ -24,6 +24,12 @@ import digital.fischers.coinsaw.ui.home.HomeScreen
 import digital.fischers.coinsaw.ui.members.AddMemberScreen
 import digital.fischers.coinsaw.ui.members.EditMemberScreen
 import digital.fischers.coinsaw.ui.members.MemberlistScreen
+import digital.fischers.coinsaw.ui.remote.EnterShareTokenScreen
+import digital.fischers.coinsaw.ui.remote.InitialSyncScreen
+import digital.fischers.coinsaw.ui.remote.MakeOnlineScreen
+import digital.fischers.coinsaw.ui.remote.ShareDetailsScreen
+import digital.fischers.coinsaw.ui.remote.ShareScreen
+import digital.fischers.coinsaw.ui.remote.ShowRecoveryTokenScreen
 
 @Composable
 fun CoinsawApp(
@@ -78,7 +84,9 @@ fun CoinsawApp(
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(onGroupAddClicked = { appState.navigateToNewGroupName() },
-                    onGroupJoinClicked = { /*TODO*/ },
+                    onGroupJoinClicked = {
+                        appState.navigateToEnterShareToken()
+                    },
                     onGroupClicked = { groupId ->
                         appState.navigateToGroup(groupId)
                     })
@@ -133,6 +141,12 @@ fun CoinsawApp(
             composable(Screen.Group.route) {
                 GroupScreen(onBackNavigation = { appState.navigateHome() },
                     onGroupSettingsClicked = {},
+                    onSharesClicked = {
+                        appState.navigateToShares(it)
+                    },
+                    onMakeOnlineClicked = {
+                        appState.navigateToMakeOnline(it)
+                    },
                     onGroupMembersClicked = {
                         appState.navigateToGroupMemberList(it)
                     },
@@ -179,6 +193,50 @@ fun CoinsawApp(
                     appState.navigateToGroup(it)
                 }, onForwardNavigation = {
                     appState.navigateToGroup(it)
+                })
+            }
+
+            composable(Screen.MakeOnline.route) {
+                MakeOnlineScreen(onBackNavigation = {
+                    appState.navigateBack()
+                }, onForwardNavigation = { groupId, recoveryToken ->
+                    appState.navigateToShowRecovery(groupId, recoveryToken)
+                })
+            }
+
+            composable(Screen.ShowRecovery.route) {
+                ShowRecoveryTokenScreen(onBackNavigation = {
+                    appState.navigateBack()
+                }, onForwardNavigation = { _, shareToken ->
+                    appState.navigateToInitialSync(shareToken)
+                })
+            }
+
+            composable(Screen.InitialSync.route) {
+                InitialSyncScreen(onForwardNavigation = { groupId ->
+                    appState.navigateToGroup(groupId)
+                })
+            }
+
+            composable(Screen.EnterShareToken.route) {
+                EnterShareTokenScreen(onBackNavigation = {
+                    appState.navigateBack()
+                }, onForwardNavigation = { shareToken ->
+                    appState.navigateToInitialSync(shareToken)
+                })
+            }
+
+            composable(Screen.Shares.route) {
+                ShareScreen(onBackNavigation = {
+                    appState.navigateBack()
+                }, navigateToShareDetails = { groupId, shareId ->
+                    appState.navigateToShareDetails(groupId, shareId)
+                })
+            }
+
+            composable(Screen.ShareDetails.route) {
+                ShareDetailsScreen(onBackNavigation = {
+                    appState.navigateBack()
                 })
             }
         }
