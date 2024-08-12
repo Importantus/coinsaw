@@ -204,6 +204,20 @@ class GroupRepositoryImpl @Inject constructor(
 
         groupDao.insert(newGroup)
 
+        this.processEntry(
+            Entry(
+                id = UUID.randomUUID().toString(),
+                groupId = newGroup.id,
+                type = EntryType.SETTINGS,
+                action = EntryAction.CREATE,
+                timestamp = System.currentTimeMillis(),
+                payload = Payload.GroupSettings(
+                    name = newGroup.name,
+                    currency = newGroup.currency
+                )
+            )
+        )
+
         return newGroup
     }
 
