@@ -15,6 +15,7 @@ import digital.fischers.coinsaw.data.remote.CreateShareRequest
 import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Session
 import digital.fischers.coinsaw.data.remote.Share
+import digital.fischers.coinsaw.data.remote.ShareWithToken
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
@@ -98,6 +99,11 @@ class RemoteRepositoryImpl @Inject constructor(
     override suspend fun getAllShares(groupId: String): List<Share> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.getAllShares(appendToServerUrl(serverUrl, ApiPath.GET_ALL_SHARES), accessToken)
+    }
+
+    override suspend fun getShare(groupId: String, shareId: String): ShareWithToken {
+        val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
+        return apiService.getShare(appendToServerUrl(serverUrl, ApiPath.GET_SHARE), accessToken, shareId)
     }
 
     override suspend fun deleteShare(groupId: String, shareId: String) {

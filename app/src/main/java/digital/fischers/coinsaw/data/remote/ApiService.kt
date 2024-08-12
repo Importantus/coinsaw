@@ -45,6 +45,13 @@ interface ApiService {
     @GET
     suspend fun getAllShares(@Url url: String, @Header("Authorization") adminSessionToken: String): List<Share>
 
+    @GET
+    suspend fun getShare(
+        @Url url: String,
+        @Header("Authorization") adminSessionToken: String,
+        @Path("id") id: String
+    ): ShareWithToken
+
     @DELETE
     suspend fun deleteShare(
         @Url url: String,

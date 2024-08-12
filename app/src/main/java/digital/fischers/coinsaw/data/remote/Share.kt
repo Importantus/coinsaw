@@ -20,3 +20,12 @@ data class Share(
     val active: Boolean,
     val sessions: List<Session>,
 )
+
+data class ShareWithToken(
+    val id: String,
+    val admin: Boolean,
+    val maxSessions: Int,
+    val active: Boolean,
+    val token: String,
+    val sessions: List<Session>,
+)

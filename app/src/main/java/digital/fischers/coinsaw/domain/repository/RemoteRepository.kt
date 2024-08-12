@@ -7,6 +7,7 @@ import digital.fischers.coinsaw.data.remote.CreateShareRequest
 import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Session
 import digital.fischers.coinsaw.data.remote.Share
+import digital.fischers.coinsaw.data.remote.ShareWithToken
 
 interface RemoteRepository {
     suspend fun createGroup(groupId: String, serverUrl: String): CreateGroupResponse
@@ -18,6 +19,8 @@ interface RemoteRepository {
     suspend fun createShare(groupId: String, options: CreateShareRequest): CreateShareResponse
 
     suspend fun getAllShares(groupId: String): List<Share>
+
+    suspend fun getShare(groupId: String, shareId: String): ShareWithToken
 
     suspend fun deleteShare(groupId: String, shareId: String)
 
