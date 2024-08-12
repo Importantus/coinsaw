@@ -100,7 +100,7 @@ class GroupRepositoryImpl @Inject constructor(
                                 amount = bill.amount ?: 0.0,
                                 userId = bill.payerId ?: "",
                                 isDeleted = bill.isDeleted ?: false,
-                                createdAt = System.currentTimeMillis(),
+                                createdAt = changeEntry.timestamp,
                                 splittings = bill.participants?.map {
                                     Splitting(
                                         userId = it.userId,
@@ -144,7 +144,7 @@ class GroupRepositoryImpl @Inject constructor(
                                 groupId = groupId,
                                 name = user.name ?: "",
                                 isDeleted = user.isDeleted ?: false,
-                                createdAt = System.currentTimeMillis(),
+                                createdAt = changeEntry.timestamp,
                                 isMe = false
                             )
                         )
