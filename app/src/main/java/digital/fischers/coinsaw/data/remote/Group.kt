@@ -8,3 +8,7 @@ data class CreateGroupResponse(
     val id: String,
     val recoveryToken: String
 )
+
+data class GroupWithoutToken(
+    val id: String
+)
