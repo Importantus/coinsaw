@@ -3,6 +3,7 @@ package digital.fischers.coinsaw.data.remote
 data class CreateShareRequest(
     val admin: Boolean,
     val maxSessions: Int,
+    val name: String
 )
 
 data class CreateShareResponse(
@@ -11,6 +12,7 @@ data class CreateShareResponse(
     val maxSessions: Int,
     val active: Boolean,
     val token: String,
+    val name: String
 )
 
 data class Share(
@@ -19,6 +21,7 @@ data class Share(
     val maxSessions: Int,
     val active: Boolean,
     val sessions: List<Session>,
+    val name: String
 )
 
 data class ShareWithToken(
@@ -28,4 +31,5 @@ data class ShareWithToken(
     val active: Boolean,
     val token: String,
     val sessions: List<Session>,
+    val name: String
 )
