@@ -40,7 +40,7 @@ class RemoteRepositoryImpl @Inject constructor(
 
     private fun getAccessTokenAndServerUrl(group: Group): Pair<String, String> {
         return Pair(
-            ("Bearer" + (group.accessToken
+            ("Bearer " + (group.accessToken
                 ?: throw IllegalStateException("Access token not found"))),
             group.apiEndpoint ?: throw IllegalStateException("API endpoint not found")
         )
