@@ -48,8 +48,7 @@ interface ApiService {
     @GET
     suspend fun getShare(
         @Url url: String,
-        @Header("Authorization") adminSessionToken: String,
-        @Path("id") id: String
+        @Header("Authorization") adminSessionToken: String
     ): ShareWithToken
 
     @DELETE
