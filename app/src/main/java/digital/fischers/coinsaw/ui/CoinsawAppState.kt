@@ -50,9 +50,36 @@ sealed class Screen(val route: String) {
         fun createRoute(groupId: String) = "group/$groupId/addItem"
     }
 
+    data object MakeOnline : Screen("group/{$ARG_GROUP_ID}/makeOnline") {
+        fun createRoute(groupId: String) = "group/$groupId/makeOnline"
+    }
+
+    data object ShowRecovery : Screen("group/{$ARG_GROUP_ID}/showRecovery/{$ARG_RECOVERY_TOKEN}") {
+        fun createRoute(groupId: String, recoveryToken: String) = "group/$groupId/showRecovery/$recoveryToken"
+    }
+
+    data object InitialSync : Screen("initialSync/{$ARG_SHARE_TOKEN}") {
+        fun createRoute(shareToken: String) = "initialSync/$shareToken"
+    }
+
+    data object EnterShareToken : Screen("enterShareToken") {
+        fun createRoute() = "enterShareToken"
+    }
+
+    data object Shares: Screen("group/{$ARG_GROUP_ID}/shares") {
+        fun createRoute(groupId: String) = "group/$groupId/shares"
+    }
+
+    data object ShareDetails: Screen("group/{$ARG_GROUP_ID}/share/{$ARG_SHARE_ID}") {
+        fun createRoute(groupId: String, shareId: String) = "group/$groupId/share/$shareId"
+    }
+
     companion object {
         const val ARG_GROUP_ID = "groupId"
         const val ARG_USER_ID = "userId"
+        const val ARG_RECOVERY_TOKEN = "recoveryToken"
+        const val ARG_SHARE_TOKEN = "shareToken"
+        const val ARG_SHARE_ID = "shareId"
     }
 }
 
@@ -118,6 +145,30 @@ class CoinsawAppState(
 
     fun navigateToNewGroupEditMember(groupId: String, userId: String) {
         navigateBackstackAware(Screen.NewGroupEditMember.createRoute(groupId, userId))
+    }
+
+    fun navigateToMakeOnline(groupId: String) {
+        navigateBackstackAware(Screen.MakeOnline.createRoute(groupId))
+    }
+
+    fun navigateToShowRecovery(groupId: String, recoveryToken: String) {
+        navigateBackstackAware(Screen.ShowRecovery.createRoute(groupId, recoveryToken))
+    }
+
+    fun navigateToInitialSync(shareToken: String) {
+        navigateBackstackAware(Screen.InitialSync.createRoute(shareToken))
+    }
+
+    fun navigateToEnterShareToken() {
+        navigateBackstackAware(Screen.EnterShareToken.createRoute())
+    }
+
+    fun navigateToShares(groupId: String) {
+        navigateBackstackAware(Screen.Shares.createRoute(groupId))
+    }
+
+    fun navigateToShareDetails(groupId: String, shareId: String) {
+        navigateBackstackAware(Screen.ShareDetails.createRoute(groupId, shareId))
     }
 
     fun navigateBack() {
