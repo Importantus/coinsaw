@@ -38,4 +38,6 @@
     <string name="by">by</string>
     <string name="you_lent">you lent</string>
     <string name="you_borrowed">you borrowed</string>
+    <string name="add_transaction">Add Transaction</string>
+    <string name="no_bills_yet">You have tracked no expenses yet.</string>
 </resources>

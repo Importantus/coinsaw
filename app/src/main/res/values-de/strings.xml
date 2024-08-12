@@ -38,4 +38,6 @@
     <string name="by">von</string>
     <string name="you_lent">du leihst</string>
     <string name="you_borrowed">du leihst dir</string>
+    <string name="add_transaction">Überweisung hinzufügen</string>
+    <string name="no_bills_yet">Du hast noch keine Ausgaben hinzugefügt</string>
 </resources>
