@@ -168,10 +168,11 @@ class GroupRepositoryImpl @Inject constructor(
         calculatedTransactionRepository.calculateForGroup(groupId)
 
         // Sync group if needed
-        val group = groupDao.getGroup(groupId).first()
-        if (group.online && group.lastSync != null && changeEntry.syncTimestamp == null) {
-            syncGroup(groupId)
-        }
+        // TODO: Think of a better solution for non-blocking sync. Currently, the group gets synced when the user opens the group screen.
+//        val group = groupDao.getGroup(groupId).first()
+//        if (group.online && group.lastSync != null && changeEntry.syncTimestamp == null) {
+//            syncGroup(groupId)
+//        }
 
     }
 
