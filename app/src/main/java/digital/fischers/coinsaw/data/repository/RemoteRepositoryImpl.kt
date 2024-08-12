@@ -85,6 +85,8 @@ class RemoteRepositoryImpl @Inject constructor(
         remoteChanges.forEach {
              groupRepository.processEntry(it)
         }
+
+        groupDao.update(group.copy(lastSync = System.currentTimeMillis()))
     }
 
     override suspend fun createShare(
