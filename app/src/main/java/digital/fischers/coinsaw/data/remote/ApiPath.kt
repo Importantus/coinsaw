@@ -6,10 +6,10 @@ enum class ApiPath(val path: String) {
     CREATE_SESSION("/v1/sessions"),
     GET_ALL_SESSIONS("/v1/sessions"),
     DELETE_SESSION("/v1/sessions"),
-    CREATE_SHARE("/v1/shares"),
-    GET_ALL_SHARES("/v1/shares"),
-    GET_SHARE("/v1/shares"),
-    DELETE_SHARE("/v1/shares"),
+    CREATE_SHARE("/v1/share"),
+    GET_ALL_SHARES("/v1/share"),
+    GET_SHARE("/v1/share"),
+    DELETE_SHARE("/v1/share"),
     GET_ENTRIES("/v1/data"),
     POST_ENTRIES("/v1/data")
 }
