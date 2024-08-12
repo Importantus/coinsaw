@@ -40,4 +40,26 @@
     <string name="you_borrowed">you borrowed</string>
     <string name="add_transaction">Add Transaction</string>
     <string name="no_bills_yet">You have tracked no expenses yet.</string>
+    <string name="screen_make_online_title">Enable syncing</string>
+    <string name="server_url_example" translatable="false">https://coinsaw.example.com</string>
+    <string name="server_url">Server url</string>
+    <string name="recovery_token">Recovery token</string>
+    <string name="recovery_token_description">Store the following string somewhere save! With this key, you can always create new sessions with admin privileges for your group.</string>
+    <string name="initial_sync">Syncing the group for the first time. This could take a while.</string>
+    <string name="screen_join_group_title">Join group</string>
+    <string name="share_token">Share key</string>
+    <string name="paste_key_here">Paste key here</string>
+    <string name="screen_share_title">Shares</string>
+    <string name="create_share_title">Create new share</string>
+    <string name="existing_shares_title">Existing shares</string>
+    <string name="share_name">Name</string>
+    <string name="share_admin_access">Admin access</string>
+    <string name="share_admin_access_desc">This share grants its users admin access</string>
+    <string name="share_max_sessions">Max sessions</string>
+    <string name="share_max_sessions_desc">How often the share can be used to create new sessions</string>
+    <string name="share_name_placeholder">My best friends</string>
+    <string name="share_admin">Admin</string>
+    <string name="screen_share_details_title">Share</string>
+    <string name="share_details_sessions_created">Sessions created</string>
+    <string name="copy_token">Copy key</string>
 </resources>

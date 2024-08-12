@@ -40,4 +40,25 @@
     <string name="you_borrowed">du leihst dir</string>
     <string name="add_transaction">Überweisung hinzufügen</string>
     <string name="no_bills_yet">Du hast noch keine Ausgaben hinzugefügt</string>
+    <string name="screen_make_online_title">Synchronisierung einschalten</string>
+    <string name="server_url">Server Url</string>
+    <string name="recovery_token">Wiederherstellungsschlüssel</string>
+    <string name="recovery_token_description">Speichere den folgenden Schlüssel an einem sicheren Ort! Damit kannst du jederzeit neue Sitzungen mit Admin-Rechten für deine Gruppe erstellen.</string>
+    <string name="initial_sync">Synchronisiere die Gruppe das erste Mal. Das kann ein bisschen dauern.</string>
+    <string name="screen_join_group_title">Gruppe beitreten</string>
+    <string name="share_token">Freigabeschlüssel</string>
+    <string name="paste_key_here">Füge den Key hier ein</string>
+    <string name="screen_share_title">Freigaben</string>
+    <string name="create_share_title">Neue Freigabe erstellen</string>
+    <string name="existing_shares_title">Existierende Freigaben</string>
+    <string name="share_name">Name</string>
+    <string name="share_admin_access">Admin-Rechte</string>
+    <string name="share_admin_access_desc">Diese Freigabe verleiht Admin-Rechte</string>
+    <string name="share_max_sessions">Maxmimale Nutzungen</string>
+    <string name="share_max_sessions_desc">Wie oft die Freigabe genutzt werden kann, um neue Sitzungen zu erstellen</string>
+    <string name="share_name_placeholder">Meine besten Freunde</string>
+    <string name="share_admin">Admin</string>
+    <string name="screen_share_details_title">Freigabe</string>
+    <string name="share_details_sessions_created">Sitzungen erstellt</string>
+    <string name="copy_token">Kopiere Schlüssel</string>
 </resources>
