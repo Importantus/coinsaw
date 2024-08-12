@@ -112,11 +112,14 @@ fun HomeScreen(
                         val group = groups[it]
                         GroupCard(groupUiState = group, onClick = { onGroupClicked(group.id) })
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ActionButtonRow(
+                            onGroupAddClicked = onGroupAddClicked, onGroupJoinClicked = onGroupJoinClicked
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                ActionButtonRow(
-                    onGroupAddClicked = onGroupAddClicked, onGroupJoinClicked = onGroupJoinClicked
-                )
             }
         }
 
