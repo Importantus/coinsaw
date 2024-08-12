@@ -2,6 +2,7 @@ package digital.fischers.coinsaw.data.repository
 
 import androidx.compose.ui.util.fastMap
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import digital.fischers.coinsaw.data.database.ChangelogDao
 import digital.fischers.coinsaw.data.database.Group
 import digital.fischers.coinsaw.data.database.GroupDao
@@ -16,11 +17,13 @@ import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Session
 import digital.fischers.coinsaw.data.remote.Share
 import digital.fischers.coinsaw.data.remote.ShareWithToken
+import digital.fischers.coinsaw.data.util.decodeToken
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import org.json.JSONObject
 import javax.inject.Inject
 
 class RemoteRepositoryImpl @Inject constructor(
@@ -112,10 +115,11 @@ class RemoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createSession(
-        groupId: String,
         options: CreateSessionRequest
     ) {
-        val (_, serverUrl) = getAccessTokenAndServerUrl(groupId)
+        val decodedToken = JSONObject(decodeToken(options.token))
+        val serverUrl = decodedToken.getString("server")
+        val groupId = decodedToken.getString("groupId")
         val response = apiService.createSession(
             appendToServerUrl(serverUrl, ApiPath.CREATE_SESSION),
             options
