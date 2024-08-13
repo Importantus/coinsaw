@@ -9,6 +9,7 @@ sealed class GroupScreenUiStates {
         val currency: String = "",
         val isOnline: Boolean = false,
         val isAdmin: Boolean = false,
+        val hasSession: Boolean = true
     )
 
     data class  User(

@@ -84,6 +84,7 @@ fun GroupScreen(
     onAddTransactionClicked: (groupId: String, amount: String?, payer: String?, payee: String?) -> Unit,
     onTransactionClicked: (groupId: String, billId: String) -> Unit,
     onSettleUpClicked: (String) -> Unit,
+    onNoSessionNavigation: () -> Unit,
     groupViewModel: GroupViewModel = hiltViewModel()
 ) {
     val group by groupViewModel.group.collectAsState()
@@ -152,7 +153,7 @@ fun GroupScreen(
                             )
                         )
 
-                        if(!group.isOnline) {
+                        if (!group.isOnline) {
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(
@@ -174,7 +175,7 @@ fun GroupScreen(
                             )
                         }
 
-                        if(group.isOnline && group.isAdmin) {
+                        if (group.isOnline && group.isAdmin) {
                             DropdownMenuItem(
                                 leadingIcon = {
                                     Icon(
@@ -216,19 +217,50 @@ fun GroupScreen(
                     )
                 }
             }
-        }
+        },
+        title = group.name
     ) {
-        // Title
-        Text(
-            text = group.name,
-            style = TextStyle(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
+        if (group.isOnline && !group.hasSession) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .clickable { onNoSessionNavigation() }
+                    .background(MaterialTheme.colorScheme.error)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.group_restart_initial_sync),
+                        style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onError
+                        )
+                    )
+                    Text(
+                        text = stringResource(id = R.string.group_restart_initial_sync_desc),
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onError.copy(alpha = 0.8f)
+                        ),
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    painter = painterResource(id = R.drawable.icon_refresh),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onError
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
         ContentWrapperWithFallback(
             members,
@@ -576,8 +608,8 @@ fun BillElement(
         payerState.name
     }
 
-    val displayedAmount = if(myShare != null) {
-        if(myShare > 0) {
+    val displayedAmount = if (myShare != null) {
+        if (myShare > 0) {
             amount - myShare
         } else {
             myShare

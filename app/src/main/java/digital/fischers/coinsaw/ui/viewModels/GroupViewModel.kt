@@ -43,7 +43,8 @@ class GroupViewModel @Inject constructor(
             name = group?.name ?: "",
             currency = group?.currency ?: "",
             isOnline = group?.online ?: false,
-            isAdmin = group?.admin ?: false
+            isAdmin = group?.admin ?: false,
+            hasSession = group?.sessionId != null
         )
     }.stateIn(
         scope = viewModelScope,

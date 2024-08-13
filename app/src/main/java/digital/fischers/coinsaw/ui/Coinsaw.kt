@@ -175,6 +175,9 @@ fun CoinsawApp(
                     onSettleUpClicked = {},
                     onTransactionClicked = { groupId, transactionId ->
 
+                    },
+                    onNoSessionNavigation = {
+                        appState.navigateToEnterShareToken("", true)
                     })
             }
 
@@ -216,7 +219,7 @@ fun CoinsawApp(
 
             composable(Screen.ShowRecovery.route) {
                 ShowRecoveryTokenScreen(onBackNavigation = {
-                    appState.navigateBack()
+                    appState.navigateHome()
                 }, onForwardNavigation = { _, shareToken ->
                     appState.navigateToInitialSync(shareToken)
                 })

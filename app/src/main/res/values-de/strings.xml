@@ -82,4 +82,7 @@
     <string name="incorrect_share_token_desc">Dein Schlüssel funktioniert nicht. Überprüf ihn nochmal!</string>
     <string name="network_error_desc">Du scheinst eine instabile Netzwerkverbindung zu haben. Bitte versuche es später nochmal.</string>
     <string name="unknown_error_desc">Irgendwas schlimmes ist passiert. Informiere deinen Admin, wenn es nochmal passiert!</string>
+    <string name="wrong_url_err">Entweder hast du keine Netzwerkverbindung, oder die URL, die du eingegeben hast, ist falsch.</string>
+    <string name="group_restart_initial_sync">Erste Synchronisation neu starten</string>
+    <string name="group_restart_initial_sync_desc">Etwas ist schief gelaufen, als du die Synchronisation angeschaltet hast. Versuch es erneut.</string>
 </resources>

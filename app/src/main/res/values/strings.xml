@@ -83,4 +83,7 @@
     <string name="incorrect_share_token_desc">Your key doesn\'t seem to work. Please put in another one!</string>
     <string name="network_error_desc">Your network connection seems to be instable. Please try again later.</string>
     <string name="unknown_error_desc">Something bad happened. Inform your admin if it happens again!</string>
+    <string name="wrong_url_err">Either you have no network connection, or the url you entered is wrong.</string>
+    <string name="group_restart_initial_sync">Restart initial sync</string>
+    <string name="group_restart_initial_sync_desc">Something went wrong when you enabled synchronisation for this group. Try again.</string>
 </resources>
