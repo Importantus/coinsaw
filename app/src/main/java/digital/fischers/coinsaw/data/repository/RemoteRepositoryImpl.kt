@@ -89,8 +89,6 @@ class RemoteRepositoryImpl @Inject constructor(
                     .create().fromJson(it.content, Entry::class.java)
             }
 
-        Log.d("RemoteRepositoryImpl", "localChanges: $localChanges")
-
         apiService.postChangelog(
             appendToServerUrl(serverUrl, ApiPath.POST_ENTRIES),
             accessToken,
@@ -106,7 +104,9 @@ class RemoteRepositoryImpl @Inject constructor(
             groupRepository.processEntry(it)
         }
 
-        groupDao.update(group.copy(lastSync = System.currentTimeMillis()))
+        val groupWithLastChanges = groupDao.getGroup(groupId).firstOrNull()
+            ?: throw IllegalStateException("Group not found")
+        groupDao.update(groupWithLastChanges.copy(lastSync = System.currentTimeMillis()))
     }
 
     override suspend fun createShare(

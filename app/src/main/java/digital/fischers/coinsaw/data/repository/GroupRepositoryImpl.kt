@@ -1,8 +1,10 @@
 package digital.fischers.coinsaw.data.repository
 
+import android.util.Log
 import com.google.gson.Gson
 import digital.fischers.coinsaw.data.database.Bill
 import digital.fischers.coinsaw.data.database.BillDao
+import digital.fischers.coinsaw.data.database.CalculatedTransactionDao
 import digital.fischers.coinsaw.data.database.Changelog
 import digital.fischers.coinsaw.data.database.ChangelogDao
 import digital.fischers.coinsaw.data.database.Group
@@ -68,6 +70,8 @@ class GroupRepositoryImpl @Inject constructor(
             )
         )
 
+        Log.d("GroupRepositoryImpl", "Processing entry: $entryJson")
+
         // Write to database
         when (changeEntry.type) {
             EntryType.SETTINGS -> {
@@ -84,7 +88,31 @@ class GroupRepositoryImpl @Inject constructor(
                     }
 
                     EntryAction.CREATE -> {
-                        throw InvalidPropertiesFormatException("Cannot create group settings")
+                        val settings = changeEntry.payload as Payload.GroupSettings
+                        val group = groupDao.getGroup(groupId).firstOrNull()
+                        if (group == null) {
+                            groupDao.insert(
+                                Group(
+                                    id = groupId,
+                                    name = settings.name ?: "",
+                                    currency = settings.currency ?: "",
+                                    online = false,
+                                    createdAt = changeEntry.timestamp,
+                                    lastSync = null,
+                                    admin = true,
+                                    accessToken = null,
+                                    apiEndpoint = null,
+                                    sessionId = null
+                                )
+                            )
+                        } else {
+                            groupDao.update(
+                                group.copy(
+                                    name = settings.name ?: group.name,
+                                    currency = settings.currency ?: group.currency
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -203,8 +231,6 @@ class GroupRepositoryImpl @Inject constructor(
             apiEndpoint = null,
             sessionId = null
         )
-
-        groupDao.insert(newGroup)
 
         this.processEntry(
             Entry(
