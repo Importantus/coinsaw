@@ -81,35 +81,11 @@ fun NewGroupScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        CustomTextField(
-            value = groupName,
-            onValueChange = { viewModel.onGroupNameChanged(it) },
-            label = stringResource(id = R.string.groupname),
-            placeholder = stringResource(id = R.string.groupname_placeholder)
+        GroupEditComponent(
+            groupName = groupName,
+            currency = currency,
+            onNameChange = viewModel::onGroupNameChanged,
+            onCurrencyChange = viewModel::onCurrencyChanged
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SettingCard(
-            title = stringResource(id = R.string.currency),
-            description = stringResource(id = R.string.currency_description),
-            setting = {
-                BasicTextField(
-                    value = currency,
-                    onValueChange = { viewModel.onCurrencyChanged(it) },
-                    textStyle = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
-                    ),
-                    singleLine = true,
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.secondary)
-                        .padding(8.dp)
-                        .width(40.dp)
-                )
-            })
     }
 }
