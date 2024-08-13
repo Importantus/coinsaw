@@ -64,9 +64,11 @@ class RemoteRepositoryImpl @Inject constructor(
                 CreateGroupRequest(groupId)
             )
         }
-        val localGroup = groupDao.getGroup(groupId).firstOrNull()
-            ?: throw IllegalStateException("Group not found")
-        groupDao.update(localGroup.copy(online = true, apiEndpoint = serverUrl))
+        if (groupResponse is APIResult.Success) {
+            val localGroup = groupDao.getGroup(groupId).firstOrNull()
+                ?: throw IllegalStateException("Group not found")
+            groupDao.update(localGroup.copy(online = true, apiEndpoint = serverUrl))
+        }
         return groupResponse
     }
 
