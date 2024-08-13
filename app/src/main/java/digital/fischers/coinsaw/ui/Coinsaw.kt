@@ -91,7 +91,9 @@ fun CoinsawApp(
             composable(Screen.Home.route) {
                 HomeScreen(onGroupAddClicked = { appState.navigateToNewGroupName() },
                     onGroupJoinClicked = {
-                        appState.navigateToEnterShareToken()
+                        appState.navigateToEnterShareToken(
+                            "", false
+                        )
                     },
                     onGroupClicked = { groupId ->
                         appState.navigateToGroup(groupId)
@@ -221,14 +223,25 @@ fun CoinsawApp(
             }
 
             composable(Screen.InitialSync.route) {
-                InitialSyncScreen(onForwardNavigation = { groupId ->
-                    appState.navigateToGroup(groupId)
-                })
+                InitialSyncScreen(
+                    onForwardNavigation = { groupId ->
+                        appState.navigateToGroup(groupId)
+                    },
+                    onSessionErrorBackwardNavigation = { shareToken, _ ->
+                        appState.navigateToEnterShareToken(
+                            shareToken,
+                            false
+                        )
+                    },
+                    onSyncErrorBackBackwardNavigation = {
+                        appState.navigateHome()
+                    }
+                )
             }
 
             composable(Screen.EnterShareToken.route) {
                 EnterShareTokenScreen(onBackNavigation = {
-                    appState.navigateBack()
+                    appState.navigateHome()
                 }, onForwardNavigation = { shareToken ->
                     appState.navigateToInitialSync(shareToken)
                 })

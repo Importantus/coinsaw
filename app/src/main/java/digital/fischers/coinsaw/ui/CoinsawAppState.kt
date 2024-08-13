@@ -62,8 +62,8 @@ sealed class Screen(val route: String) {
         fun createRoute(shareToken: String) = "initialSync/$shareToken"
     }
 
-    data object EnterShareToken : Screen("enterShareToken") {
-        fun createRoute() = "enterShareToken"
+    data object EnterShareToken : Screen("enterShareToken/{$ARG_SHARE_TOKEN_ERROR}/{$ARG_GROUP_MISSING_SESSION_ERROR}") {
+        fun createRoute(shareToken: String, groupMissingSession: Boolean) = "enterShareToken/$shareToken/$groupMissingSession"
     }
 
     data object Shares: Screen("group/{$ARG_GROUP_ID}/shares") {
@@ -80,6 +80,8 @@ sealed class Screen(val route: String) {
         const val ARG_RECOVERY_TOKEN = "recoveryToken"
         const val ARG_SHARE_TOKEN = "shareToken"
         const val ARG_SHARE_ID = "shareId"
+        const val ARG_SHARE_TOKEN_ERROR = "shareTokenError"
+        const val ARG_GROUP_MISSING_SESSION_ERROR = "groupMissingSessionError"
     }
 }
 
@@ -159,8 +161,8 @@ class CoinsawAppState(
         navigateBackstackAware(Screen.InitialSync.createRoute(shareToken))
     }
 
-    fun navigateToEnterShareToken() {
-        navigateBackstackAware(Screen.EnterShareToken.createRoute())
+    fun navigateToEnterShareToken(shareToken: String, groupMissingSession: Boolean) {
+        navigateBackstackAware(Screen.EnterShareToken.createRoute(shareToken, groupMissingSession))
     }
 
     fun navigateToShares(groupId: String) {

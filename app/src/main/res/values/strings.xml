@@ -67,4 +67,18 @@
     <string name="delete_group">Delete group</string>
     <string name="delete_group_confirmation">Do you want to delete the group? Currently this will onl delete the group locally from your device.</string>
     <string name="edit_group_menu_item">Edit group</string>
+    <string name="screen_missing_token_title">Recovery Token</string>
+    <string name="enter_share_token_desc">You should have gotten a long, cryptic string. That’s a share key that you can use, to join the group.</string>
+    <string name="enter_missing_token_desc">Something went wrong, when you turned on the group syncing. Please paste your recovery key here so we can try again.</string>
+    <string name="screen_join_group_big_title">Paste key</string>
+    <string name="ok">OK</string>
+    <string name="network_error">Syncerror</string>
+    <string name="error_400">The server could not understand the request. Please check your inputs.</string>
+    <string name="error_401">Your credentials are wrong. You don\'t have access to this.</string>
+    <string name="error_403">You do not have permission to access this ressource.</string>
+    <string name="error_404">Whoops. The data is nowhere to be found.</string>
+    <string name="error_500">Whoops. There was an error on the server. If it persists, you should contant your admin!</string>
+    <string name="error_generic">There was an error while accessing the server. Try again or contact your admin!</string>
+    <string name="incorrect_share_token">Incorrect key</string>
+    <string name="incorrect_share_token_desc">Your key doesn\'t seem to work. Please put in another one!</string>
 </resources>

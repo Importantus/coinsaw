@@ -166,46 +166,53 @@ class RemoteRepositoryImpl @Inject constructor(
     override suspend fun createSession(
         options: CreateSessionRequest
     ): Response<CreateSessionResponse> {
-        val decodedToken = JSONObject(decodeToken(options.token))
-        val serverUrl = decodedToken.getString("server")
-        val groupId = decodedToken.getString("groupId")
-        val response = apiService.createSession(
-            appendToServerUrl(serverUrl, ApiPath.CREATE_SESSION),
-            options
-        )
+        try {
+            val decodedToken = JSONObject(decodeToken(options.token))
+            val serverUrl = decodedToken.getString("server")
+            val groupId = decodedToken.getString("groupId")
+            val response = apiService.createSession(
+                appendToServerUrl(serverUrl, ApiPath.CREATE_SESSION),
+                options
+            )
 
-        if (response.isSuccessful) {
-            val group = groupDao.getGroup(groupId).firstOrNull()
+            if (response.isSuccessful) {
+                val group = groupDao.getGroup(groupId).firstOrNull()
 
-            val session = response.body()!!
+                val session = response.body()!!
 
-            if (group == null) {
-                groupDao.insert(
-                    Group(
-                        id = groupId,
-                        name = "",
-                        currency = "",
-                        online = true,
-                        createdAt = System.currentTimeMillis(),
-                        lastSync = null,
-                        admin = session.admin,
-                        accessToken = session.token,
-                        apiEndpoint = serverUrl,
-                        sessionId = session.id
+                if (group == null) {
+                    groupDao.insert(
+                        Group(
+                            id = groupId,
+                            name = "",
+                            currency = "",
+                            online = true,
+                            createdAt = System.currentTimeMillis(),
+                            lastSync = null,
+                            admin = session.admin,
+                            accessToken = session.token,
+                            apiEndpoint = serverUrl,
+                            sessionId = session.id
+                        )
                     )
-                )
-            } else {
-                groupDao.update(
-                    group.copy(
-                        sessionId = session.id,
-                        accessToken = session.token,
-                        admin = session.admin,
-                        online = true
+                } else {
+                    groupDao.update(
+                        group.copy(
+                            sessionId = session.id,
+                            accessToken = session.token,
+                            admin = session.admin,
+                            online = true
+                        )
                     )
-                )
+                }
             }
+            return response
+        } catch (e: Exception) {
+            Log.e("RemoteRepositoryImpl", "Error creating session", e)
+            return Response.error(400, null)
         }
-        return response
+
+
     }
 
     override suspend fun getAllSessions(groupId: String): Response<List<Session>> {

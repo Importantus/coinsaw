@@ -66,4 +66,18 @@
     <string name="delete_group">Gruppe löschen</string>
     <string name="delete_group_confirmation">Möchtes du die Gruppe wirklich löschen? Im Moment kannst du sie nur lokal löschen. Eventuelle synchronisierte Inhalte verbleiben auf dem Server.</string>
     <string name="edit_group_menu_item">Gruppe bearbeiten</string>
+    <string name="screen_missing_token_title">Wiederherstellungsschlüssel</string>
+    <string name="enter_share_token_desc">Du solltest eine lange, kryptische Zeichenfolge bekommen haben. Das ist ein Schlüssel, mit dem du der Gruppe beitreten kannst.</string>
+    <string name="enter_missing_token_desc">Etwas scheint schiefgelaufen zu sein, als du die Synchronisierung deiner Gruppe angeschaltet hast. Füge hier deinen Wiederherstellungsschlüssel ein, sodass wir es erneut probieren können!</string>
+    <string name="screen_join_group_big_title">Schlüssel einfügen</string>
+    <string name="ok">OK</string>
+    <string name="network_error">Syncfehler</string>
+    <string name="error_400">Der Server konnte die Anfrage nicht verstehen. Überprüfe deine Eingaben</string>
+    <string name="error_401">Deine Anmeldedaten sind falsch. Du hast hier keinen Zugang.</string>
+    <string name="error_403">Du hast nicht die Berechtigung, hierauf zuzugreifen.</string>
+    <string name="error_404">Ups. Die Daten können nicht gefunden werden.</string>
+    <string name="error_500">Ups. Der Server ist in einen Fehler gelaufen. Sollte das wieder vorkommen, kontaktiere deinen Admin!</string>
+    <string name="error_generic">Es gab einen Fehler beim Zugriff auf den Server. Versuch es nochmal oder kontaktiere deinen Admin!</string>
+    <string name="incorrect_share_token">Falscher Schlüssel</string>
+    <string name="incorrect_share_token_desc">Dein Schlüssel funktioniert nicht. Überprüf ihn nochmal!</string>
 </resources>

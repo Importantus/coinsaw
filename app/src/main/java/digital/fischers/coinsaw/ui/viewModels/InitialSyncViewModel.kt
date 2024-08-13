@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.ui.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,23 +21,47 @@ class InitialSyncViewModel @Inject constructor(
     private val remoteRepository: RemoteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    val shareToken: String = savedStateHandle.get<String>(Screen.ARG_SHARE_TOKEN)!!
-    val groupId: String = JSONObject(decodeToken(shareToken)).getString("groupId")
-
     var ready by mutableStateOf(false)
         private set
 
-    var error by mutableStateOf(false)
+    var sessionError: Int? by mutableStateOf(null)
         private set
+
+    var syncError: Int? by mutableStateOf(null)
+        private set
+
+    val shareToken: String = savedStateHandle.get<String>(Screen.ARG_SHARE_TOKEN)!!
+    val groupId: String? = try {
+        JSONObject(decodeToken(shareToken)).getString("groupId")
+    } catch (e: Exception) {
+        sessionError = 400
+        null
+    }
 
     init {
         viewModelScope.launch {
-            try {
-                remoteRepository.createSession(CreateSessionRequest(shareToken, android.os.Build.MODEL))
-                remoteRepository.syncGroup(groupId)
-                ready = true
-            } catch (e: Exception) {
-                error = true
+            if(groupId != null) {
+                val sessionResponse = remoteRepository.createSession(
+                    CreateSessionRequest(
+                        shareToken,
+                        android.os.Build.MODEL
+                    )
+                )
+
+                if (!sessionResponse.isSuccessful) {
+                    sessionError = sessionResponse.code()
+                    Log.d("InitialSyncViewModel", "Session error: $sessionError")
+                }
+
+                val syncResponse = remoteRepository.syncGroup(groupId)
+
+                if (!syncResponse.isSuccessful) {
+                    syncError = syncResponse.code()
+                }
+
+                if (sessionResponse.isSuccessful && syncResponse.isSuccessful) {
+                    ready = true
+                }
             }
         }
     }
