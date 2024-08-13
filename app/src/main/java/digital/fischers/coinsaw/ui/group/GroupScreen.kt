@@ -612,15 +612,7 @@ fun BillElement(
         payerState.name
     }
 
-    val displayedAmount = if (myShare != null) {
-        if (myShare > 0) {
-            amount - myShare
-        } else {
-            myShare
-        }
-    } else {
-        amount
-    }
+    val displayedAmount = myShare ?: amount
     Row(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
@@ -632,7 +624,8 @@ fun BillElement(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = name, style = TextStyle(
@@ -648,27 +641,29 @@ fun BillElement(
                 )
             )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (myShare != null) {
+        if(displayedAmount != 0.0) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (myShare != null) {
+                    Text(
+                        text = if (displayedAmount > 0) stringResource(id = R.string.you_lent) else stringResource(
+                            id = R.string.you_borrowed
+                        ), style = TextStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    )
+                }
                 Text(
-                    text = if (displayedAmount > 0) stringResource(id = R.string.you_lent) else stringResource(
-                        id = R.string.you_borrowed
-                    ), style = TextStyle(
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onBackground
+                    text = "%.2f".format(abs(displayedAmount)) + " " + currency,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        color = if (displayedAmount > 0) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.error
                     )
                 )
             }
-            Text(
-                text = "%.2f".format(abs(displayedAmount)) + " " + currency,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    color = if (displayedAmount > 0) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.error
-                )
-            )
         }
     }
 }

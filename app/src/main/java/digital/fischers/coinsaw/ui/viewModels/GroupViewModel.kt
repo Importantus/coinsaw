@@ -82,14 +82,18 @@ class GroupViewModel @Inject constructor(
     val bills = billRepository.getBillsByGroupAndIsDeletedStream(groupId, isDeleted = false).map { bills ->
         val me = userRepository.getUserByGroupIdAndIsMeStream(groupId, true).firstOrNull()
         bills.map {
-            val myShare = it.splittings.find { split -> split.userId == me?.id }?.percent
+            var myShare = it.splittings.find { split -> split.userId == me?.id }?.percent
+            if(me != null && it.userId == me.id) {
+                myShare = 1.0 - (myShare ?: 0.0)
+            }
             val myShareMultiplier = if(me != null && it.userId == me.id) 1 else -1
-            GroupScreenUiStates.Bill(
+            Log.d("GroupViewModel", "myShare: $myShare, myShareMultiplier: $myShareMultiplier, amount: ${it.amount}")
+            val temp  = GroupScreenUiStates.Bill(
                 id = it.id,
                 name = it.name,
                 amount = it.amount,
                 created = it.createdAt,
-                myShare = if (myShare != null) it.amount * myShare * myShareMultiplier else null,
+                myShare = it.amount * (myShare ?: 0.0) * myShareMultiplier,
                 payer = getUserStateFlow(it.userId),
                 // Only get splittings if title is empty (meaning it's a transaction)
                 splitting = if(it.name.isBlank()) it.splittings.map { splitting ->
@@ -99,6 +103,8 @@ class GroupViewModel @Inject constructor(
                     )
                 } else emptyList()
             )
+            Log.d("GroupViewModel", "temp: $temp")
+            temp
         }
     }.stateIn(
         scope = viewModelScope,
