@@ -80,4 +80,6 @@
     <string name="error_generic">Es gab einen Fehler beim Zugriff auf den Server. Versuch es nochmal oder kontaktiere deinen Admin!</string>
     <string name="incorrect_share_token">Falscher Schlüssel</string>
     <string name="incorrect_share_token_desc">Dein Schlüssel funktioniert nicht. Überprüf ihn nochmal!</string>
+    <string name="network_error_desc">Du scheinst eine instabile Netzwerkverbindung zu haben. Bitte versuche es später nochmal.</string>
+    <string name="unknown_error_desc">Irgendwas schlimmes ist passiert. Informiere deinen Admin, wenn es nochmal passiert!</string>
 </resources>

@@ -1,6 +1,5 @@
 package digital.fischers.coinsaw.data.remote
 
-import digital.fischers.coinsaw.data.database.Changelog
 import digital.fischers.coinsaw.domain.changelog.Entry
 import retrofit2.Response
 import retrofit2.http.Body
@@ -12,7 +11,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
-interface ApiService {
+interface Api {
     @POST
     suspend fun createGroup(@Url url: String, @Body body: CreateGroupRequest): Response<CreateGroupResponse>
 

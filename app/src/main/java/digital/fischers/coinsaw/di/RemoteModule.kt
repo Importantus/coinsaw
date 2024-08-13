@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import digital.fischers.coinsaw.data.remote.ApiService
+import digital.fischers.coinsaw.data.remote.Api
 import digital.fischers.coinsaw.data.util.ChangelogJSONAdapter
 import digital.fischers.coinsaw.domain.changelog.Entry
 import okhttp3.OkHttpClient
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class RemoteModule {
     @Provides
     @Singleton
-    fun provideCoinsawApi(): ApiService {
+    fun provideCoinsawApi(): Api {
         val client = OkHttpClient
             .Builder()
             .addInterceptor(
@@ -35,6 +35,6 @@ class RemoteModule {
                 GsonBuilder().registerTypeAdapter(Entry::class.java, ChangelogJSONAdapter())
                 .create()))
             .build()
-            .create(ApiService::class.java)
+            .create(Api::class.java)
     }
 }

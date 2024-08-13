@@ -42,9 +42,9 @@ fun InitialSyncScreen(
 
         if (sessionError != null) {
             CustomErrorAlert(
-                errorCode = sessionError,
-                customTitle = stringResource(id = R.string.incorrect_share_token),
-                customMessage = stringResource(
+                error = sessionError,
+                customFallbackTitle = stringResource(id = R.string.incorrect_share_token),
+                customFallbackMessage = stringResource(
                     id = R.string.incorrect_share_token_desc
                 ),
                 onConfirm = { onSessionErrorBackwardNavigation(shareToken, "") }
@@ -53,7 +53,7 @@ fun InitialSyncScreen(
 
         if (syncError != null) {
             CustomErrorAlert(
-                errorCode = syncError,
+                error = syncError,
                 onConfirm = { onSyncErrorBackBackwardNavigation() }
             )
         }

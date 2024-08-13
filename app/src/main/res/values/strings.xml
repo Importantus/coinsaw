@@ -72,7 +72,7 @@
     <string name="enter_missing_token_desc">Something went wrong, when you turned on the group syncing. Please paste your recovery key here so we can try again.</string>
     <string name="screen_join_group_big_title">Paste key</string>
     <string name="ok">OK</string>
-    <string name="network_error">Syncerror</string>
+    <string name="network_error">Sync Error</string>
     <string name="error_400">The server could not understand the request. Please check your inputs.</string>
     <string name="error_401">Your credentials are wrong. You don\'t have access to this.</string>
     <string name="error_403">You do not have permission to access this ressource.</string>
@@ -81,4 +81,6 @@
     <string name="error_generic">There was an error while accessing the server. Try again or contact your admin!</string>
     <string name="incorrect_share_token">Incorrect key</string>
     <string name="incorrect_share_token_desc">Your key doesn\'t seem to work. Please put in another one!</string>
+    <string name="network_error_desc">Your network connection seems to be instable. Please try again later.</string>
+    <string name="unknown_error_desc">Something bad happened. Inform your admin if it happens again!</string>
 </resources>

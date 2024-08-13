@@ -7,6 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import digital.fischers.coinsaw.data.remote.APIError
+import digital.fischers.coinsaw.data.remote.APIResult
 import digital.fischers.coinsaw.data.remote.CreateShareRequest
 import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Share
@@ -24,6 +26,9 @@ class ShareViewModel @Inject constructor(
 ) : ViewModel() {
     val groupId = stateHandle.get<String>(Screen.ARG_GROUP_ID)!!
     var loading by mutableStateOf(true)
+        private set
+
+    var networkError by mutableStateOf(false)
         private set
 
     var errorLoadingShares: Int? by mutableStateOf(null)
@@ -68,27 +73,59 @@ class ShareViewModel @Inject constructor(
             )
         )
 
-        if (shareResponse.isSuccessful) {
-            _newShareAdmin.value = false
-            _newShareMaxSessions.value = "1"
-            _newShareName.value = ""
-        } else {
-            errorCreatingShare = shareResponse.code()
+        when (shareResponse) {
+            is APIResult.Error -> {
+                when (shareResponse.exception) {
+                    is APIError.CustomError -> {
+                        errorCreatingShare = shareResponse.exception.code
+                    }
+                    APIError.NetworkError -> {
+                        networkError = true
+                    }
+                    APIError.UnknownError -> {
+                        networkError = true
+                    }
+                }
+                loading = false
+                return null
+            }
+            is APIResult.Success -> {
+                errorCreatingShare = null
+                _newShareAdmin.value = false
+                _newShareMaxSessions.value = "1"
+                _newShareName.value = ""
+
+                loading = false
+                return shareResponse.data
+            }
         }
-        loading = false
-        return shareResponse.body()
     }
 
     private suspend fun loadAllShares(): List<Share>? {
         loading = true
-        val sharesResponse = remoteRepository.getAllShares(groupId)
-
-        if (!sharesResponse.isSuccessful) {
-            errorLoadingShares = sharesResponse.code()
+        val shares = when (val sharesResponse = remoteRepository.getAllShares(groupId)) {
+            is APIResult.Error -> {
+                when (sharesResponse.exception) {
+                    is APIError.CustomError -> {
+                        errorLoadingShares = sharesResponse.exception.code
+                    }
+                    APIError.NetworkError -> {
+                        networkError = true
+                    }
+                    APIError.UnknownError -> {
+                        networkError = true
+                    }
+                }
+                null
+            }
+            is APIResult.Success -> {
+                errorLoadingShares = null
+                sharesResponse.data
+            }
         }
 
         loading = false
-        return sharesResponse.body()
+        return shares
     }
 
     init {

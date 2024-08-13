@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import digital.fischers.coinsaw.data.remote.APIResult
 import digital.fischers.coinsaw.data.remote.CreateGroupResponse
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.ui.Screen
@@ -35,11 +36,17 @@ class MakeOnlineViewModel @Inject constructor(
 
     suspend fun makeOnline(): CreateGroupResponse? {
         loading = true
-        val groupResponse = remoteRepository.createGroup(groupId, _serverUrlState.value)
-
-        wrongServerUrl = !groupResponse.isSuccessful
-
-        loading = false
-        return groupResponse.body()
+        when(val groupResponse = remoteRepository.createGroup(groupId, _serverUrlState.value)) {
+            is APIResult.Error -> {
+                wrongServerUrl = true
+                loading = false
+                return null
+            }
+            is APIResult.Success -> {
+                wrongServerUrl = false
+                loading = false
+                return groupResponse.data
+            }
+        }
     }
 }
