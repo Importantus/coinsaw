@@ -22,7 +22,7 @@ import digital.fischers.coinsaw.ui.components.CustomTextField
 import digital.fischers.coinsaw.ui.components.SettingCard
 
 @Composable
-fun GroupEditComponent(
+fun GroupEditForm(
     groupName: String,
     currency: String,
     onNameChange: (String) -> Unit,
