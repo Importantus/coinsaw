@@ -28,7 +28,7 @@ class ShareDetailsViewModel @Inject constructor(
     var loading by mutableStateOf(false)
         private set
 
-    var error by mutableStateOf(false)
+    var error: Int? by mutableStateOf(null)
         private set
 
     var share: ShareWithToken? by mutableStateOf(null)
@@ -36,49 +36,36 @@ class ShareDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            try {
-                Log.d("ShareDetailsViewModel", "groupId: $groupId, shareId: $shareId")
-                loading = true
-                share = remoteRepository.getShare(groupId, shareId)
-                Log.d("ShareDetailsViewModel", "share: $share")
-            } catch (e: Exception) {
-                Log.d("ShareDetailsViewModel", "error: $e")
-                error = true
-            } finally {
-                loading = false
-            }
+            loadShare()
         }
     }
 
-    suspend fun generateQRCode(content: String) {
-        viewModelScope.launch {
-            val qr = QRCode
-                .ofRoundedSquares()
-//                .withColor(color)
-                .withBackgroundColor(Colors.TRANSPARENT)
-                .withSize(30).build(content)
-            val bytes = qr.renderToBytes()
-            BitmapFactory.decodeByteArray(
-                bytes,
-                0,
-                bytes.size
-            )
-        }.invokeOnCompletion {
+    suspend fun loadShare() {
+        loading = true
+        val shareResponse = remoteRepository.getShare(groupId, shareId)
 
+        error = if (!shareResponse.isSuccessful) {
+            shareResponse.code()
+        } else {
+            null
         }
 
+        loading = false
+        share = shareResponse.body()
     }
 
     suspend fun deleteShare(): Boolean {
-        try {
-            loading = true
-            remoteRepository.deleteShare(groupId, shareId)
-            return true
-        } catch (e: Exception) {
-            error = true
-        } finally {
-            loading = false
+        loading = true
+
+        val shareResponse = remoteRepository.deleteShare(groupId, shareId)
+
+        error = if (!shareResponse.isSuccessful) {
+            shareResponse.code()
+        } else {
+            null
         }
-        return false
+
+        loading = false
+        return shareResponse.isSuccessful
     }
 }

@@ -1,10 +1,8 @@
 package digital.fischers.coinsaw.ui.viewModels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +12,6 @@ import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Share
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.ui.Screen
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,10 +26,10 @@ class ShareViewModel @Inject constructor(
     var loading by mutableStateOf(true)
         private set
 
-    var errorLoadingShares by mutableStateOf(false)
+    var errorLoadingShares: Int? by mutableStateOf(null)
         private set
 
-    var errorCreatingShare by mutableStateOf(false)
+    var errorCreatingShare: Int? by mutableStateOf(null)
         private set
 
     private var _existingShares = MutableStateFlow(emptyList<Share>())
@@ -63,40 +60,40 @@ class ShareViewModel @Inject constructor(
 
     suspend fun createShare(): CreateShareResponse? {
         loading = true
-        try {
-            val share = remoteRepository.createShare(groupId, CreateShareRequest(
+        val shareResponse = remoteRepository.createShare(
+            groupId, CreateShareRequest(
                 name = newShareName.value,
                 admin = newShareAdmin.value,
                 maxSessions = newShareMaxSessions.value.toInt()
-            ))
+            )
+        )
 
+        if (shareResponse.isSuccessful) {
             _newShareAdmin.value = false
             _newShareMaxSessions.value = "1"
             _newShareName.value = ""
-
-            loading = false
-            errorCreatingShare = false
-            return share
-        } catch (e: Exception) {
-            errorCreatingShare = true
-            Log.d("ShareViewModel", "Error creating share", e)
-            loading = false
+        } else {
+            errorCreatingShare = shareResponse.code()
         }
-        return null
+        loading = false
+        return shareResponse.body()
+    }
+
+    private suspend fun loadAllShares(): List<Share>? {
+        loading = true
+        val sharesResponse = remoteRepository.getAllShares(groupId)
+
+        if (!sharesResponse.isSuccessful) {
+            errorLoadingShares = sharesResponse.code()
+        }
+
+        loading = false
+        return sharesResponse.body()
     }
 
     init {
         viewModelScope.launch {
-            try {
-                loading = true
-                _existingShares.value = remoteRepository.getAllShares(groupId)
-                loading = false
-                errorLoadingShares = false
-            } catch (e: Exception) {
-                errorLoadingShares = true
-                Log.d("ShareViewModel", "Error loading shares", e)
-                loading = false
-            }
+            _existingShares.value = loadAllShares() ?: emptyList()
         }
     }
 }

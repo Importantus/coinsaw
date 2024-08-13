@@ -35,13 +35,11 @@ class MakeOnlineViewModel @Inject constructor(
 
     suspend fun makeOnline(): CreateGroupResponse? {
         loading = true
-        var response: CreateGroupResponse? = null
-        try {
-            response = remoteRepository.createGroup(groupId, _serverUrlState.value)
-        } catch (e: Exception) {
-            wrongServerUrl = true
-        }
+        val groupResponse = remoteRepository.createGroup(groupId, _serverUrlState.value)
+
+        wrongServerUrl = !groupResponse.isSuccessful
+
         loading = false
-        return response
+        return groupResponse.body()
     }
 }
