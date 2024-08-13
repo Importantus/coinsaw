@@ -62,7 +62,7 @@ fun GroupEditForm(
 }
 
 fun currencyValidator(currency: String): String {
-    return currency.take(1)
+    return currency.take(3)
 }
 
 fun nameValidator(name: String): String {
