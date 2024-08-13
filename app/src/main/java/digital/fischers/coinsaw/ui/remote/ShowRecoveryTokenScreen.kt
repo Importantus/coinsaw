@@ -60,8 +60,7 @@ fun ShowRecoveryTokenScreen(
                 text = stringResource(id = R.string.recovery_token_description),
                 style = TextStyle(
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Black
+                    fontWeight = FontWeight.Normal
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
