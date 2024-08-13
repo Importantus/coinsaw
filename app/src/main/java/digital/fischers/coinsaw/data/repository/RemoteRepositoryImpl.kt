@@ -27,6 +27,7 @@ import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import org.json.JSONObject
+import retrofit2.Response
 import javax.inject.Inject
 
 class RemoteRepositoryImpl @Inject constructor(
@@ -53,7 +54,10 @@ class RemoteRepositoryImpl @Inject constructor(
         return "${serverUrl.removeSuffix("/")}/${path.path.removePrefix("/")}"
     }
 
-    override suspend fun createGroup(groupId: String, serverUrl: String): CreateGroupResponse {
+    override suspend fun createGroup(
+        groupId: String,
+        serverUrl: String
+    ): Response<CreateGroupResponse> {
         val groupResponse = apiService.createGroup(
             appendToServerUrl(serverUrl, ApiPath.CREATE_GROUP),
             CreateGroupRequest(groupId)
@@ -64,7 +68,7 @@ class RemoteRepositoryImpl @Inject constructor(
         return groupResponse
     }
 
-    override suspend fun deleteGroup(groupId: String) {
+    override suspend fun deleteGroup(groupId: String): Response<Unit> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.deleteGroup(
             appendToServerUrl(serverUrl, ApiPath.DELETE_GROUP),
@@ -73,7 +77,7 @@ class RemoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun syncGroup(groupId: String) {
+    override suspend fun syncGroup(groupId: String): Response<Unit> {
         val group = groupDao.getGroup(groupId).firstOrNull()
             ?: throw IllegalStateException("Group not found")
 
@@ -89,30 +93,43 @@ class RemoteRepositoryImpl @Inject constructor(
                     .create().fromJson(it.content, Entry::class.java)
             }
 
-        apiService.postChangelog(
+        val postResponse = apiService.postChangelog(
             appendToServerUrl(serverUrl, ApiPath.POST_ENTRIES),
             accessToken,
             localChanges
         )
 
-        val remoteChanges = apiService.getChangelog(
-            appendToServerUrl(serverUrl, ApiPath.GET_ENTRIES),
-            accessToken,
-            lastSyncTimestamp
-        )
-        remoteChanges.forEach {
-            groupRepository.processEntry(it)
+        if (postResponse.isSuccessful) {
+            val getResponse = apiService.getChangelog(
+                appendToServerUrl(serverUrl, ApiPath.GET_ENTRIES),
+                accessToken,
+                lastSyncTimestamp
+            )
+
+            if (getResponse.isSuccessful) {
+                val remoteChanges = getResponse.body()!!
+
+                remoteChanges.forEach {
+                    groupRepository.processEntry(it)
+                }
+
+                val groupWithLastChanges = groupDao.getGroup(groupId).firstOrNull()
+                    ?: throw IllegalStateException("Group not found")
+                groupDao.update(groupWithLastChanges.copy(lastSync = System.currentTimeMillis()))
+            } else {
+                return Response.error(getResponse.code(), getResponse.errorBody()!!)
+            }
+        } else {
+            return postResponse
         }
 
-        val groupWithLastChanges = groupDao.getGroup(groupId).firstOrNull()
-            ?: throw IllegalStateException("Group not found")
-        groupDao.update(groupWithLastChanges.copy(lastSync = System.currentTimeMillis()))
+        return postResponse
     }
 
     override suspend fun createShare(
         groupId: String,
         options: CreateShareRequest
-    ): CreateShareResponse {
+    ): Response<CreateShareResponse> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.createShare(
             appendToServerUrl(serverUrl, ApiPath.CREATE_SHARE),
@@ -121,7 +138,7 @@ class RemoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getAllShares(groupId: String): List<Share> {
+    override suspend fun getAllShares(groupId: String): Response<List<Share>> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.getAllShares(
             appendToServerUrl(serverUrl, ApiPath.GET_ALL_SHARES),
@@ -129,7 +146,7 @@ class RemoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getShare(groupId: String, shareId: String): ShareWithToken {
+    override suspend fun getShare(groupId: String, shareId: String): Response<ShareWithToken> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.getShare(
             appendToServerUrl(serverUrl, ApiPath.GET_SHARE) + "/${shareId}",
@@ -137,7 +154,7 @@ class RemoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun deleteShare(groupId: String, shareId: String) {
+    override suspend fun deleteShare(groupId: String, shareId: String): Response<Unit> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.deleteShare(
             appendToServerUrl(serverUrl, ApiPath.DELETE_SHARE),
@@ -148,7 +165,7 @@ class RemoteRepositoryImpl @Inject constructor(
 
     override suspend fun createSession(
         options: CreateSessionRequest
-    ) {
+    ): Response<CreateSessionResponse> {
         val decodedToken = JSONObject(decodeToken(options.token))
         val serverUrl = decodedToken.getString("server")
         val groupId = decodedToken.getString("groupId")
@@ -157,36 +174,41 @@ class RemoteRepositoryImpl @Inject constructor(
             options
         )
 
-        val group = groupDao.getGroup(groupId).firstOrNull()
+        if (response.isSuccessful) {
+            val group = groupDao.getGroup(groupId).firstOrNull()
 
-        if (group == null) {
-            groupDao.insert(
-                Group(
-                    id = groupId,
-                    name = "",
-                    currency = "",
-                    online = true,
-                    createdAt = System.currentTimeMillis(),
-                    lastSync = null,
-                    admin = response.admin,
-                    accessToken = response.token,
-                    apiEndpoint = serverUrl,
-                    sessionId = response.id
+            val session = response.body()!!
+
+            if (group == null) {
+                groupDao.insert(
+                    Group(
+                        id = groupId,
+                        name = "",
+                        currency = "",
+                        online = true,
+                        createdAt = System.currentTimeMillis(),
+                        lastSync = null,
+                        admin = session.admin,
+                        accessToken = session.token,
+                        apiEndpoint = serverUrl,
+                        sessionId = session.id
+                    )
                 )
-            )
-        } else {
-            groupDao.update(
-                group.copy(
-                    sessionId = response.id,
-                    accessToken = response.token,
-                    admin = response.admin,
-                    online = true
+            } else {
+                groupDao.update(
+                    group.copy(
+                        sessionId = session.id,
+                        accessToken = session.token,
+                        admin = session.admin,
+                        online = true
+                    )
                 )
-            )
+            }
         }
+        return response
     }
 
-    override suspend fun getAllSessions(groupId: String): List<Session> {
+    override suspend fun getAllSessions(groupId: String): Response<List<Session>> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.getAllSessions(
             appendToServerUrl(serverUrl, ApiPath.GET_ALL_SESSIONS),
@@ -194,7 +216,7 @@ class RemoteRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun deleteSession(groupId: String, sessionId: String) {
+    override suspend fun deleteSession(groupId: String, sessionId: String): Response<Unit> {
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiService.deleteSession(
             appendToServerUrl(serverUrl, ApiPath.DELETE_SESSION),
