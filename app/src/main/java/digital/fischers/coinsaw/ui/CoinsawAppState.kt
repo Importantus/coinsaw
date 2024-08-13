@@ -1,6 +1,7 @@
 package digital.fischers.coinsaw.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -97,8 +98,9 @@ class CoinsawAppState(
     val navController: NavHostController,
     private val context: Context
 ) {
-    private fun navigateBackstackAware(route: String) {
-        if(navController.previousBackStackEntry?.destination?.route != route) {
+    private fun navigateBackstackAware(route: String, screen: Screen) {
+        val previousRoute = navController.previousBackStackEntry?.destination?.route
+        if(previousRoute != screen.route) {
             navController.navigate(route)
         } else {
             navController.popBackStack()
@@ -106,71 +108,71 @@ class CoinsawAppState(
     }
 
     fun navigateHome() {
-        navigateBackstackAware(Screen.Home.route)
+        navigateBackstackAware(Screen.Home.route, Screen.Home)
     }
 
     fun navigateToGroup(groupId: String) {
-        navigateBackstackAware(Screen.Group.createRoute(groupId))
+        navigateBackstackAware(Screen.Group.createRoute(groupId), Screen.Group)
     }
 
     fun navigateToGroupSettings(groupId: String) {
-        navigateBackstackAware(Screen.GroupSettings.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupSettings.createRoute(groupId), Screen.GroupSettings)
     }
 
     fun navigateToGroupMemberList(groupId: String) {
-        navigateBackstackAware(Screen.GroupMemberList.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupMemberList.createRoute(groupId), Screen.GroupMemberList)
     }
 
     fun navigateToGroupCreateMember(groupId: String) {
-        navigateBackstackAware(Screen.GroupCreateMember.createRoute(groupId))
+        navigateBackstackAware(Screen.GroupCreateMember.createRoute(groupId), Screen.GroupCreateMember)
     }
 
     fun navigateToGroupEditMember(groupId: String, userId: String) {
-        navigateBackstackAware(Screen.GroupEditMember.createRoute(groupId, userId))
+        navigateBackstackAware(Screen.GroupEditMember.createRoute(groupId, userId), Screen.GroupEditMember)
     }
 
     fun navigateToAddBill(groupId: String) {
-        navigateBackstackAware(Screen.AddBill.createRoute(groupId))
+        navigateBackstackAware(Screen.AddBill.createRoute(groupId), Screen.AddBill)
     }
 
     fun navigateToNewGroupName() {
-        navigateBackstackAware(Screen.NewGroupSettings.route)
+        navigateBackstackAware(Screen.NewGroupSettings.route, Screen.NewGroupSettings)
     }
 
     fun navigateToNewGroupCreateMember(groupId: String) {
-        navigateBackstackAware(Screen.NewGroupCreateMember.createRoute(groupId))
+        navigateBackstackAware(Screen.NewGroupCreateMember.createRoute(groupId), Screen.NewGroupCreateMember)
     }
 
     fun navigateToNewGroupMemberList(groupId: String) {
-        navigateBackstackAware(Screen.NewGroupMemberList.createRoute(groupId))
+        navigateBackstackAware(Screen.NewGroupMemberList.createRoute(groupId), Screen.NewGroupMemberList)
     }
 
     fun navigateToNewGroupEditMember(groupId: String, userId: String) {
-        navigateBackstackAware(Screen.NewGroupEditMember.createRoute(groupId, userId))
+        navigateBackstackAware(Screen.NewGroupEditMember.createRoute(groupId, userId) , Screen.NewGroupEditMember)
     }
 
     fun navigateToMakeOnline(groupId: String) {
-        navigateBackstackAware(Screen.MakeOnline.createRoute(groupId))
+        navigateBackstackAware(Screen.MakeOnline.createRoute(groupId), Screen.MakeOnline)
     }
 
     fun navigateToShowRecovery(groupId: String, recoveryToken: String) {
-        navigateBackstackAware(Screen.ShowRecovery.createRoute(groupId, recoveryToken))
+        navigateBackstackAware(Screen.ShowRecovery.createRoute(groupId, recoveryToken), Screen.ShowRecovery)
     }
 
     fun navigateToInitialSync(shareToken: String) {
-        navigateBackstackAware(Screen.InitialSync.createRoute(shareToken))
+        navigateBackstackAware(Screen.InitialSync.createRoute(shareToken), Screen.InitialSync)
     }
 
     fun navigateToEnterShareToken(shareToken: String, groupMissingSession: Boolean) {
-        navigateBackstackAware(Screen.EnterShareToken.createRoute(shareToken, groupMissingSession))
+        navigateBackstackAware(Screen.EnterShareToken.createRoute(shareToken, groupMissingSession), Screen.EnterShareToken)
     }
 
     fun navigateToShares(groupId: String) {
-        navigateBackstackAware(Screen.Shares.createRoute(groupId))
+        navigateBackstackAware(Screen.Shares.createRoute(groupId), Screen.Shares)
     }
 
     fun navigateToShareDetails(groupId: String, shareId: String) {
-        navigateBackstackAware(Screen.ShareDetails.createRoute(groupId, shareId))
+        navigateBackstackAware(Screen.ShareDetails.createRoute(groupId, shareId), Screen.ShareDetails)
     }
 
     fun navigateBack() {
