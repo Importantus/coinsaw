@@ -28,4 +28,7 @@ interface BillDao {
 
     @Update
     suspend fun updateBill(bill: Bill)
+
+    @Query("DELETE FROM bill WHERE groupId = :groupId")
+    suspend fun deleteAllByGroupId(groupId: String)
 }

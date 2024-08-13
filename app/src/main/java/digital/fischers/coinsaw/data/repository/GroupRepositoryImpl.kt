@@ -29,6 +29,7 @@ class GroupRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
     private val billDao: BillDao,
     private val changelogDao: ChangelogDao,
+    private val calculatedTransactionDao: CalculatedTransactionDao,
     private val calculatedTransactionRepository: CalculatedTransactionRepository
 ) : GroupRepository {
     override fun getAllGroupsStream(): Flow<List<Group>> {
@@ -223,6 +224,10 @@ class GroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteGroup(groupId: String) {
+        changelogDao.deleteAllByGroupId(groupId)
+        billDao.deleteAllByGroupId(groupId)
+        userDao.deleteAllByGroupId(groupId)
+        calculatedTransactionDao.deleteAllByGroupId(groupId)
         return groupDao.delete(groupId)
     }
 

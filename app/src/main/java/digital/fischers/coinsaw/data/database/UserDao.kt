@@ -31,4 +31,7 @@ interface UserDao {
 
     @Update
     suspend fun update(user: User)
+
+    @Query("DELETE FROM user WHERE groupId = :groupId")
+    suspend fun deleteAllByGroupId(groupId: String)
 }

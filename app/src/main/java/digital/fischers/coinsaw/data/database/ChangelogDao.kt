@@ -24,4 +24,7 @@ interface ChangelogDao {
 
     @Insert
     suspend fun insert(entry: Changelog)
+
+    @Query("DELETE FROM changelog WHERE groupId = :groupId")
+    suspend fun deleteAllByGroupId(groupId: String)
 }
