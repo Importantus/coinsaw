@@ -44,7 +44,7 @@ class ShareViewModel @Inject constructor(
     private var _newShareAdmin = MutableStateFlow(false)
     val newShareAdmin = _newShareAdmin.asStateFlow()
 
-    private var _newShareMaxSessions = MutableStateFlow(1)
+    private var _newShareMaxSessions = MutableStateFlow("1")
     val newShareMaxSessions = _newShareMaxSessions.asStateFlow()
 
     fun onNameChanged(name: String) {
@@ -57,8 +57,8 @@ class ShareViewModel @Inject constructor(
 
     fun onMaxSessionsChanged(maxSessions: String) {
         // Filter out all non-digit characters
-        val numberString = maxSessions.filter { it.isDigit() }
-        _newShareMaxSessions.value = numberString.toInt()
+        val numberString = maxSessions.take(6).filter { it.isDigit() }
+        _newShareMaxSessions.value = numberString
     }
 
     suspend fun createShare(): CreateShareResponse? {
@@ -67,11 +67,11 @@ class ShareViewModel @Inject constructor(
             val share = remoteRepository.createShare(groupId, CreateShareRequest(
                 name = newShareName.value,
                 admin = newShareAdmin.value,
-                maxSessions = newShareMaxSessions.value
+                maxSessions = newShareMaxSessions.value.toInt()
             ))
 
             _newShareAdmin.value = false
-            _newShareMaxSessions.value = 1
+            _newShareMaxSessions.value = "1"
             _newShareName.value = ""
 
             loading = false

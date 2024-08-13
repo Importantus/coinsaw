@@ -101,7 +101,7 @@ fun ShareScreen(
 fun ShareForm(
     newShareName: String,
     newShareAdmin: Boolean,
-    newShareMaxSessions: Int,
+    newShareMaxSessions: String,
     onNameChanged: (String) -> Unit,
     onAdminChanged: (Boolean) -> Unit,
     onMaxSessionsChanged: (String) -> Unit,
@@ -146,7 +146,7 @@ fun ShareForm(
             description = stringResource(id = R.string.share_max_sessions_desc),
             setting = {
                 BasicTextField(
-                    value = newShareMaxSessions.toString(),
+                    value = newShareMaxSessions,
                     onValueChange = { onMaxSessionsChanged(it) },
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions.Default.copy(
