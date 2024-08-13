@@ -61,4 +61,9 @@
     <string name="screen_share_details_title">Freigabe</string>
     <string name="share_details_sessions_created">Sitzungen erstellt</string>
     <string name="copy_token">Kopiere Schlüssel</string>
+    <string name="screen_group_edit_title">Gruppeneinstellungen</string>
+    <string name="delete">Löschen</string>
+    <string name="delete_group">Gruppe löschen</string>
+    <string name="delete_group_confirmation">Möchtes du die Gruppe wirklich löschen? Im Moment kannst du sie nur lokal löschen. Eventuelle synchronisierte Inhalte verbleiben auf dem Server.</string>
+    <string name="edit_group_menu_item">Gruppe bearbeiten</string>
 </resources>

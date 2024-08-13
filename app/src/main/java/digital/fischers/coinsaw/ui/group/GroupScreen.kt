@@ -115,6 +115,26 @@ fun GroupScreen(
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
+                                    painter = painterResource(id = R.drawable.icon_edit),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onBackground
+                                )
+                            },
+                            text = {
+                                Text(text = stringResource(id = R.string.edit_group_menu_item))
+                            },
+                            onClick = {
+                                onGroupSettingsClicked(groupId)
+                                menuExpanded = false
+                            },
+                            colors = MenuDefaults.itemColors(
+                                textColor = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
+
+                        DropdownMenuItem(
+                            leadingIcon = {
+                                Icon(
                                     painter = painterResource(id = R.drawable.icon_users),
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onBackground

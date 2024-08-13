@@ -62,4 +62,9 @@
     <string name="screen_share_details_title">Share</string>
     <string name="share_details_sessions_created">Sessions created</string>
     <string name="copy_token">Copy key</string>
+    <string name="screen_group_edit_title">Groupsettings</string>
+    <string name="delete">Delete</string>
+    <string name="delete_group">Delete group</string>
+    <string name="delete_group_confirmation">Do you want to delete the group? Currently this will onl delete the group locally from your device.</string>
+    <string name="edit_group_menu_item">Edit group</string>
 </resources>

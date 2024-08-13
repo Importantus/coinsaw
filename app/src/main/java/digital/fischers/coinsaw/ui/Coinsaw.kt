@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import digital.fischers.coinsaw.ui.bill.AddBillScreen
+import digital.fischers.coinsaw.ui.group.GroupEditScreen
 import digital.fischers.coinsaw.ui.group.GroupScreen
 import digital.fischers.coinsaw.ui.group.NewGroupScreen
 import digital.fischers.coinsaw.ui.home.HomeScreen
@@ -57,9 +58,11 @@ fun CoinsawApp(
                     initialDeep > targetDeep -> {
                         (scaleIn(
                             initialScale = 0.98f,
-                            animationSpec = tween(backwardAnimationDuration))
-                        + fadeIn(animationSpec = tween(backwardAnimationDuration)))
+                            animationSpec = tween(backwardAnimationDuration)
+                        )
+                                + fadeIn(animationSpec = tween(backwardAnimationDuration)))
                     }
+
                     else -> EnterTransition.None
                 }
             },
@@ -72,12 +75,15 @@ fun CoinsawApp(
                         AnimatedContentTransitionScope.SlideDirection.Right,
                         animationSpec = tween(backwardAnimationDuration)
                     )
+
                     initialDeep < targetDeep -> {
                         (scaleOut(
                             targetScale = 0.98f,
-                            animationSpec = tween(forwardAnimationDuration))
-                        + fadeOut(animationSpec = tween(forwardAnimationDuration)))
+                            animationSpec = tween(forwardAnimationDuration)
+                        )
+                                + fadeOut(animationSpec = tween(forwardAnimationDuration)))
                     }
+
                     else -> ExitTransition.None
                 }
             },
@@ -140,7 +146,9 @@ fun CoinsawApp(
 
             composable(Screen.Group.route) {
                 GroupScreen(onBackNavigation = { appState.navigateHome() },
-                    onGroupSettingsClicked = {},
+                    onGroupSettingsClicked = {
+                        appState.navigateToGroupSettings(it)
+                    },
                     onSharesClicked = {
                         appState.navigateToShares(it)
                     },
@@ -238,6 +246,12 @@ fun CoinsawApp(
                 ShareDetailsScreen(onBackNavigation = {
                     appState.navigateBack()
                 })
+            }
+
+            composable(Screen.GroupSettings.route) {
+                GroupEditScreen(onBackNavigation = {
+                    appState.navigateBack()
+                }, onAfterDeleteNavigation = { appState.navigateHome() })
             }
         }
     }
