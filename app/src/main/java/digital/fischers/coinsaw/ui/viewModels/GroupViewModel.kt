@@ -8,6 +8,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import digital.fischers.coinsaw.data.database.Group
+import digital.fischers.coinsaw.data.remote.APIResult
 import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
 import digital.fischers.coinsaw.domain.repository.GroupRepository
@@ -38,14 +40,11 @@ class GroupViewModel @Inject constructor(
     var syncError by mutableStateOf(false)
         private set
 
+    var syncing by mutableStateOf(false)
+        private set
+
     val group = groupRepository.getGroupStream(groupId).map { group ->
-        GroupScreenUiStates.Group(
-            name = group?.name ?: "",
-            currency = group?.currency ?: "",
-            isOnline = group?.online ?: false,
-            isAdmin = group?.admin ?: false,
-            hasSession = group?.sessionId != null
-        )
+        groupUIStateFromGroup(group)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000L),
@@ -109,19 +108,32 @@ class GroupViewModel @Inject constructor(
 
     init {
             viewModelScope.launch {
-                val group = groupRepository.getGroupStream(groupId).first()
-                Log.d("GroupViewModel", "Syncing group ${group?.online}")
-                if(group?.online == true) {
-                    try {
-                        Log.d("GroupViewModel", "Syncing group $groupId")
-                        remoteRepository.syncGroup(groupId)
-                        syncError = false
-                    } catch (e: Exception) {
-                        Log.e("GroupViewModel", "Error syncing group $groupId", e)
-                        syncError = true
-                    }
-                }
+                val group = groupRepository.getGroupStream(groupId).map {
+                    group -> groupUIStateFromGroup(group)
+                }.first()
+                syncGroup(group)
             }
+    }
+
+    fun syncGroup(group: GroupScreenUiStates.Group) {
+        viewModelScope.launch {
+            if(group.isOnline && group.hasSession) {
+                syncing = true
+                val response = remoteRepository.syncGroup(groupId)
+                syncError = response is APIResult.Error
+                syncing = false
+            }
+        }
+    }
+
+    private fun groupUIStateFromGroup(group: Group?): GroupScreenUiStates.Group {
+        return GroupScreenUiStates.Group(
+            name = group?.name ?: "",
+            currency = group?.currency ?: "",
+            isOnline = group?.online ?: false,
+            isAdmin = group?.admin ?: false,
+            hasSession = group?.sessionId != null
+        )
     }
 
     private fun getUserStateFlow(userId: String) = userRepository.getUserStream(userId).map { user ->

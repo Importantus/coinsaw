@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.qrcode.kotlin)
+    implementation(libs.androidx.material)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 

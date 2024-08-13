@@ -93,9 +93,13 @@ fun GroupScreen(
     val calculatedTransactions by groupViewModel.calculatedTransactions.collectAsState()
     val groupId = groupViewModel.groupId
 
+    val syncing = groupViewModel.syncing
+
     var menuExpanded by remember { mutableStateOf(false) }
 
     BaseScreen(
+        refreshing = syncing,
+        onRefresh = { if(group.isOnline && group.hasSession) { groupViewModel.syncGroup(group) } },
         appBar = {
             CustomNavigationBar(
                 title = stringResource(id = R.string.screen_group_title),
