@@ -99,7 +99,9 @@ fun GroupScreen(
 
     BaseScreen(
         refreshing = syncing,
-        onRefresh = { if(group.isOnline && group.hasSession) { groupViewModel.syncGroup(group) } },
+        onRefresh = if(group.isOnline && group.hasSession) { { groupViewModel.syncGroup(group) } } else {
+            null
+        },
         appBar = {
             CustomNavigationBar(
                 title = stringResource(id = R.string.screen_group_title),
