@@ -23,7 +23,7 @@ sealed class GroupScreenUiStates {
         val name: String = "",
         val created: Long = 0,
         val amount: Double = 0.0,
-        val payer: StateFlow<User>,
+        val payer: StateFlow<User>? = null,
         val myShare: Double? = null,
         val splitting: List<Splitting> = emptyList()
     )
