@@ -12,6 +12,7 @@ import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID
 import javax.inject.Inject
 
@@ -74,5 +75,24 @@ class BillRepositoryImpl @Inject constructor(
         )
 
         groupRepository.processEntry(entry)
+    }
+
+    override suspend fun deleteBill(billId: String) {
+        val bill = billDao.getBillById(billId).firstOrNull()
+        if(bill != null) {
+            val entry = Entry(
+                id = UUID.randomUUID().toString(),
+                groupId = bill.groupId,
+                type = EntryType.BILL,
+                action = EntryAction.UPDATE,
+                timestamp = System.currentTimeMillis(),
+                payload = Payload.Bill(
+                    id = bill.id,
+                    isDeleted = true
+                )
+            )
+
+            groupRepository.processEntry(entry)
+        }
     }
 }

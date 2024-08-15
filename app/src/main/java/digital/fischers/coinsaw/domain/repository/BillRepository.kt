@@ -13,4 +13,5 @@ interface BillRepository {
 
     suspend fun createBill(groupId: String, bill: CreateUiStates.Bill)
     suspend fun updateBill(groupId: String, changes: Payload.Bill)
+    suspend fun deleteBill(billId: String)
 }
