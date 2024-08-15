@@ -102,7 +102,9 @@ fun GroupScreen(
 
     BaseScreen(
         refreshing = syncing,
-        onRefresh = if(group.isOnline && group.hasSession) { { groupViewModel.syncGroup(group) } } else {
+        onRefresh = if (group.isOnline && group.hasSession) {
+            { groupViewModel.syncGroup(group) }
+        } else {
             null
         },
         appBar = {
@@ -295,110 +297,113 @@ fun GroupScreen(
                     }
                 }
             }) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                item {
-                    ContentWrapperWithFallback(calculatedTransactions, showCondition = calculatedTransactions.isNotEmpty(),
-                        loading = {
-                            Text(text = stringResource(id = R.string.loading))
-                        },
-                        fallback = { Text(
-                        text = "🎉 " + stringResource(id = R.string.settled_up)
-                    ) }) {
-                    calculatedTransactions.forEach { transaction ->
-                        val payer by transaction.payer.collectAsState()
-                        if (payer.isMe) {
-                            val payee by transaction.payee.collectAsState()
-                            CalculatedTransactionElement(
-                                currency = group.currency,
-                                amount = transaction.amount,
-                                payer = payer.name,
-                                payee = payee.name,
-                                payerIsMe = true,
-                                onClick = {
-                                    onAddTransactionClicked(
-                                        groupId,
-                                        transaction.id,
-                                        payer.id,
-                                        payee.id
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    item {
+                        ContentWrapperWithFallback(calculatedTransactions,
+                            showCondition = calculatedTransactions.isNotEmpty(),
+                            loading = {
+                                Text(text = stringResource(id = R.string.loading))
+                            },
+                            fallback = {
+                                Text(
+                                    text = "🎉 " + stringResource(id = R.string.settled_up)
+                                )
+                            }) {
+                            calculatedTransactions.forEach { transaction ->
+                                val payer by transaction.payer.collectAsState()
+                                if (payer.isMe) {
+                                    val payee by transaction.payee.collectAsState()
+                                    CalculatedTransactionElement(
+                                        currency = group.currency,
+                                        amount = transaction.amount,
+                                        payer = payer.name,
+                                        payee = payee.name,
+                                        payerIsMe = true,
+                                        onClick = {
+                                            onAddTransactionClicked(
+                                                groupId,
+                                                transaction.id,
+                                                payer.id,
+                                                payee.id
+                                            )
+                                        }
                                     )
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        calculatedTransactions.forEach { transaction ->
-                            val payer by transaction.payer.collectAsState()
-                            if (!payer.isMe) {
-                                val payee by transaction.payee.collectAsState()
-                                CalculatedTransactionElement(
-                                    currency = group.currency,
-                                    amount = transaction.amount,
-                                    payer = payer.name,
-                                    payee = payee.name,
-                                    payerIsMe = false,
-                                    onClick = {
-                                        onAddTransactionClicked(
-                                            groupId,
-                                            transaction.id,
-                                            payer.id,
-                                            payee.id
+                            }
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                calculatedTransactions.forEach { transaction ->
+                                    val payer by transaction.payer.collectAsState()
+                                    if (!payer.isMe) {
+                                        val payee by transaction.payee.collectAsState()
+                                        CalculatedTransactionElement(
+                                            currency = group.currency,
+                                            amount = transaction.amount,
+                                            payer = payer.name,
+                                            payee = payee.name,
+                                            payerIsMe = false,
+                                            onClick = {
+                                                onAddTransactionClicked(
+                                                    groupId,
+                                                    transaction.id,
+                                                    payer.id,
+                                                    payee.id
+                                                )
+                                            }
                                         )
                                     }
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Divider(
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                            modifier = Modifier.fillMaxWidth(),
+                            thickness = 1.dp
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    items(count = bills.size) { index ->
+                        val bill = bills[index]
+                        BaseTimeLineElement(
+                            bill.created
+                        ) {
+                            val payer by bill.payer!!.collectAsState()
+                            if (bill.name.isBlank() && bill.splitting.size == 1) {
+                                TransactionElement(
+                                    currency = group.currency,
+                                    payer = payer,
+                                    amount = bill.amount,
+                                    payee = bill.splitting.first().user,
+                                    onClick = { onTransactionClicked(groupId, bill.id) }
+                                )
+                            } else {
+                                BillElement(
+                                    meSet = meSet,
+                                    currency = group.currency,
+                                    name = bill.name,
+                                    amount = bill.amount,
+                                    payer = payer,
+                                    myShare = bill.myShare,
+                                    onClick = { onBillClicked(groupId, bill.id) }
                                 )
                             }
                         }
                     }
+
+                    item {
+                        Spacer(modifier = Modifier.height(42.dp))
                     }
                 }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Divider(
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
-                        modifier = Modifier.fillMaxWidth(),
-                        thickness = 1.dp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                items(count = bills.size) { index ->
-                    val bill = bills[index]
-                    BaseTimeLineElement(
-                        bill.created
-                    ) {
-                        val payer by bill.payer!!.collectAsState()
-                        if (bill.name.isBlank() && bill.splitting.size == 1) {
-                            TransactionElement(
-                                currency = group.currency,
-                                payer = payer,
-                                amount = bill.amount,
-                                payee = bill.splitting.first().user,
-                                onClick = { onTransactionClicked(groupId, bill.id) }
-                            )
-                        } else {
-                            BillElement(
-                                meSet = meSet,
-                                currency = group.currency,
-                                name = bill.name,
-                                amount = bill.amount,
-                                payer = payer,
-                                myShare = bill.myShare,
-                                onClick = { onBillClicked(groupId, bill.id) }
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(42.dp))
-                }
-            }
             }
         }
     }
@@ -678,7 +683,7 @@ fun BillElement(
                 )
             )
         }
-        if(displayedAmount != 0.0) {
+        if (displayedAmount != 0.0) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -701,7 +706,7 @@ fun BillElement(
                     )
                 )
             }
-        } else if(!involved && meSet) {
+        } else if (!involved && meSet) {
             Text(
                 text = stringResource(id = R.string.not_involved),
                 style = TextStyle(
