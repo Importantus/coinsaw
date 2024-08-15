@@ -27,6 +27,7 @@ import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.components.DeleteModal
 import digital.fischers.coinsaw.ui.viewModels.GroupEditViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -94,6 +95,8 @@ fun GroupEditScreen(
         }
         if (showDeleteModal) {
             DeleteModal(
+                title = stringResource(id = R.string.delete_group),
+                description = stringResource(id = R.string.delete_group_confirmation),
                 onConfirm = {
                     coroutineScope.launch {
                         viewModel.deleteGroup()
@@ -106,38 +109,4 @@ fun GroupEditScreen(
             )
         }
     }
-}
-
-@Composable
-fun DeleteModal(
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit
-) {
-    AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.large,
-        onDismissRequest = onCancel,
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    color = MaterialTheme.colorScheme.error,
-                    text = stringResource(id = R.string.delete)
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onCancel) {
-                Text(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    text = stringResource(id = R.string.cancel)
-                )
-            }
-        },
-        title = {
-            Text(stringResource(id = R.string.delete_group))
-        },
-        text = {
-            Text(stringResource(id = R.string.delete_group_confirmation))
-        }
-    )
 }
