@@ -66,8 +66,7 @@ fun AddMemberScreen(
             )
         },
         blockingLoading = loading,
-        title = if (isInGroupCreationFlow) stringResource(id = R.string.screen_first_member_title)
-        else stringResource(id = R.string.add_member)
+        title = stringResource(id = R.string.add_member)
     ) {
         CustomTextField(
             value = newUserState.name,
