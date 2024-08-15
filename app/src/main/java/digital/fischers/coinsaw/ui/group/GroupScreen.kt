@@ -105,7 +105,7 @@ fun GroupScreen(
         appBar = {
             CustomNavigationBar(
                 title = stringResource(id = R.string.screen_group_title),
-                backNavigationText = stringResource(id = R.string.screen_title_groups),
+                backNavigationText = null,
                 backNavigation = { onBackNavigation() },
                 menu = {
                     CustomButton(

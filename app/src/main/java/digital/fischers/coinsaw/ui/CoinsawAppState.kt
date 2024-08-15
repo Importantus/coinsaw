@@ -1,7 +1,6 @@
 package digital.fischers.coinsaw.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -75,12 +74,17 @@ sealed class Screen(val route: String) {
         fun createRoute(groupId: String, shareId: String) = "group/$groupId/share/$shareId"
     }
 
+    data object BillDetails: Screen("group/{$ARG_GROUP_ID}/bill/{$ARG_BILL_ID}") {
+        fun createRoute(groupId: String, billId: String) = "group/$groupId/bill/$billId"
+    }
+
     companion object {
         const val ARG_GROUP_ID = "groupId"
         const val ARG_USER_ID = "userId"
         const val ARG_RECOVERY_TOKEN = "recoveryToken"
         const val ARG_SHARE_TOKEN = "shareToken"
         const val ARG_SHARE_ID = "shareId"
+        const val ARG_BILL_ID = "billId"
         const val ARG_SHARE_TOKEN_ERROR = "shareTokenError"
         const val ARG_GROUP_MISSING_SESSION_ERROR = "groupMissingSessionError"
     }
@@ -173,6 +177,10 @@ class CoinsawAppState(
 
     fun navigateToShareDetails(groupId: String, shareId: String) {
         navigateBackstackAware(Screen.ShareDetails.createRoute(groupId, shareId), Screen.ShareDetails)
+    }
+
+    fun navigateToBillDetails(groupId: String, billId: String) {
+        navigateBackstackAware(Screen.BillDetails.createRoute(groupId, billId), Screen.BillDetails)
     }
 
     fun navigateBack() {
