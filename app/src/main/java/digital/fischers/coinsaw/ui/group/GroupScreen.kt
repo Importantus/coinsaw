@@ -297,6 +297,13 @@ fun GroupScreen(
                     .fillMaxSize()
             ) {
                 item {
+                    ContentWrapperWithFallback(calculatedTransactions, showCondition = calculatedTransactions.isNotEmpty(),
+                        loading = {
+                            Text(text = stringResource(id = R.string.loading))
+                        },
+                        fallback = { Text(
+                        text = "🎉 " + stringResource(id = R.string.settled_up)
+                    ) }) {
                     calculatedTransactions.forEach { transaction ->
                         val payer by transaction.payer.collectAsState()
                         if (payer.isMe) {
@@ -343,6 +350,7 @@ fun GroupScreen(
                                 )
                             }
                         }
+                    }
                     }
                 }
 
