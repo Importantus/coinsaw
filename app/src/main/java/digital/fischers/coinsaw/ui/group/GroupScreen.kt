@@ -312,31 +312,31 @@ fun GroupScreen(
                                     text = "🎉 " + stringResource(id = R.string.settled_up)
                                 )
                             }) {
-                            calculatedTransactions.forEach { transaction ->
-                                val payer by transaction.payer.collectAsState()
-                                if (payer.isMe) {
-                                    val payee by transaction.payee.collectAsState()
-                                    CalculatedTransactionElement(
-                                        currency = group.currency,
-                                        amount = transaction.amount,
-                                        payer = payer.name,
-                                        payee = payee.name,
-                                        payerIsMe = true,
-                                        onClick = {
-                                            onAddTransactionClicked(
-                                                groupId,
-                                                transaction.id,
-                                                payer.id,
-                                                payee.id
-                                            )
-                                        }
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                }
-                            }
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
+                                calculatedTransactions.forEach { transaction ->
+                                    val payer by transaction.payer.collectAsState()
+                                    if (payer.isMe) {
+                                        val payee by transaction.payee.collectAsState()
+                                        CalculatedTransactionElement(
+                                            currency = group.currency,
+                                            amount = transaction.amount,
+                                            payer = payer.name,
+                                            payee = payee.name,
+                                            payerIsMe = true,
+                                            onClick = {
+                                                onAddTransactionClicked(
+                                                    groupId,
+                                                    transaction.id,
+                                                    payer.id,
+                                                    payee.id
+                                                )
+                                            }
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
+                                }
                                 calculatedTransactions.forEach { transaction ->
                                     val payer by transaction.payer.collectAsState()
                                     if (!payer.isMe) {
