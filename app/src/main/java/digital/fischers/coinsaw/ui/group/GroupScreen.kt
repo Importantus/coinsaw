@@ -372,7 +372,7 @@ fun GroupScreen(
                         if (bill.name.isBlank() && bill.splitting.size == 1) {
                             TransactionElement(
                                 currency = group.currency,
-                                payer = bill.payer,
+                                payer = bill.payer!!,
                                 amount = bill.amount,
                                 payee = bill.splitting.first().user,
                                 onClick = { onTransactionClicked(groupId, bill.id) }
@@ -382,7 +382,7 @@ fun GroupScreen(
                                 currency = group.currency,
                                 name = bill.name,
                                 amount = bill.amount,
-                                payer = bill.payer,
+                                payer = bill.payer!!,
                                 myShare = bill.myShare,
                                 onClick = { onBillClicked(groupId, bill.id) }
                             )
