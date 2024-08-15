@@ -121,7 +121,7 @@ class RemoteRepositoryImpl @Inject constructor(
                     is APIResult.Success -> {
                         val remoteChanges = getResponse.data
 
-                        remoteChanges.forEach {
+                        remoteChanges.reversed().forEach {
                             groupRepository.processEntry(it)
                         }
 
