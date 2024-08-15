@@ -85,4 +85,10 @@
     <string name="wrong_url_err">Entweder hast du keine Netzwerkverbindung, oder die URL, die du eingegeben hast, ist falsch.</string>
     <string name="group_restart_initial_sync">Erste Synchronisation neu starten</string>
     <string name="group_restart_initial_sync_desc">Etwas ist schief gelaufen, als du die Synchronisation angeschaltet hast. Versuch es erneut.</string>
+    <string name="add_first_bill">Füge deine erste Ausgabe hinzu</string>
+    <string name="loading">Lädt...</string>
+    <string name="settled_up">Alles ausgeglichen!</string>
+    <string name="screen_bill_details_title">Ausgabe</string>
+    <string name="delete_expense">Ausgabe löschen</string>
+    <string name="delete_expense_desc">Willst du diese Ausgabe wirklich löschen?</string>
 </resources>

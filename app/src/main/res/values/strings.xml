@@ -86,4 +86,10 @@
     <string name="wrong_url_err">Either you have no network connection, or the url you entered is wrong.</string>
     <string name="group_restart_initial_sync">Restart initial sync</string>
     <string name="group_restart_initial_sync_desc">Something went wrong when you enabled synchronisation for this group. Try again.</string>
+    <string name="add_first_bill">Add your first expense</string>
+    <string name="loading">Loading...</string>
+    <string name="settled_up">All settled up!</string>
+    <string name="screen_bill_details_title">Expense</string>
+    <string name="delete_expense">Delete expense</string>
+    <string name="delete_expense_desc">Do you really want to delete this expense?</string>
 </resources>
