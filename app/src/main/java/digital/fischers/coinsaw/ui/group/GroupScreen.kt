@@ -272,6 +272,24 @@ fun GroupScreen(
             fallback = {
                 NoMembers(onAddMemberClicked = { onAddMemberClicked(groupId) })
             }) {
+            ContentWrapperWithFallback(bills, showCondition = bills.isNotEmpty(), fallback = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.8f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(onClick = { onAddBillClicked(groupId) }) {
+                        Text(
+                            text = stringResource(id = R.string.add_first_bill), style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.background
+                            )
+                        )
+                    }
+                }
+            }) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -365,6 +383,7 @@ fun GroupScreen(
                 item {
                     Spacer(modifier = Modifier.height(42.dp))
                 }
+            }
             }
         }
     }
