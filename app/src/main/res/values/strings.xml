@@ -92,4 +92,5 @@
     <string name="screen_bill_details_title">Expense</string>
     <string name="delete_expense">Delete expense</string>
     <string name="delete_expense_desc">Do you really want to delete this expense?</string>
+    <string name="not_involved">Not involved</string>
 </resources>

@@ -91,4 +91,5 @@
     <string name="screen_bill_details_title">Ausgabe</string>
     <string name="delete_expense">Ausgabe löschen</string>
     <string name="delete_expense_desc">Willst du diese Ausgabe wirklich löschen?</string>
+    <string name="not_involved">Nicht beiteiligt</string>
 </resources>

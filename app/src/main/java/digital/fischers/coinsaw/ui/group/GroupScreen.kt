@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -92,6 +93,8 @@ fun GroupScreen(
     val bills by groupViewModel.bills.collectAsState()
     val calculatedTransactions by groupViewModel.calculatedTransactions.collectAsState()
     val groupId = groupViewModel.groupId
+
+    val meSet = members.any { it.isMe }
 
     val syncing = groupViewModel.syncing
 
@@ -369,20 +372,22 @@ fun GroupScreen(
                     BaseTimeLineElement(
                         bill.created
                     ) {
+                        val payer by bill.payer!!.collectAsState()
                         if (bill.name.isBlank() && bill.splitting.size == 1) {
                             TransactionElement(
                                 currency = group.currency,
-                                payer = bill.payer!!,
+                                payer = payer,
                                 amount = bill.amount,
                                 payee = bill.splitting.first().user,
                                 onClick = { onTransactionClicked(groupId, bill.id) }
                             )
                         } else {
                             BillElement(
+                                meSet = meSet,
                                 currency = group.currency,
                                 name = bill.name,
                                 amount = bill.amount,
-                                payer = bill.payer!!,
+                                payer = payer,
                                 myShare = bill.myShare,
                                 onClick = { onBillClicked(groupId, bill.id) }
                             )
@@ -626,29 +631,32 @@ fun BaseTimeLineElement(
 
 @Composable
 fun BillElement(
+    meSet: Boolean,
     currency: String,
     name: String,
     amount: Double,
-    payer: StateFlow<GroupScreenUiStates.User>,
+    payer: GroupScreenUiStates.User,
     myShare: Double?,
     onClick: () -> Unit
 ) {
-    val payerState by payer.collectAsState()
-
     val byline = if (myShare != null) {
-        "%.2f".format(amount) + " $currency ${stringResource(id = R.string.by)} ${payerState.name}"
+        "%.2f".format(amount) + " $currency ${stringResource(id = R.string.by)} ${payer.name}"
     } else {
-        payerState.name
+        payer.name
     }
 
     val displayedAmount = myShare ?: amount
+
+    val involved = (payer.isMe || (myShare != null && myShare != 0.0))
+
     Row(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
             .clickable { onClick() }
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(10.dp)
+            .alpha(if (involved || !meSet) 1f else 0.5f),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -693,6 +701,14 @@ fun BillElement(
                     )
                 )
             }
+        } else if(!involved && meSet) {
+            Text(
+                text = stringResource(id = R.string.not_involved),
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            )
         }
     }
 }
@@ -700,7 +716,7 @@ fun BillElement(
 @Composable
 fun TransactionElement(
     currency: String,
-    payer: StateFlow<GroupScreenUiStates.User>,
+    payer: GroupScreenUiStates.User,
     amount: Double,
     payee: StateFlow<GroupScreenUiStates.User>,
     onClick: () -> Unit
