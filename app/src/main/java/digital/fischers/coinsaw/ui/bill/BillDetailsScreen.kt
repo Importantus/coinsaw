@@ -111,7 +111,7 @@ fun BillDetailsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = user.name)
-                    Text(text = "%.2f".format(splitting.percentage) + "%")
+                    Text(text = Math.round(splitting.percentage * 100).toString() + "%")
                     Text(
                         color = MaterialTheme.colorScheme.error,
                         text = "%.2f".format(splitting.percentage * bill!!.amount) + " " + group.currency
