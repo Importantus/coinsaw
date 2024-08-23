@@ -5,9 +5,9 @@
 <p align="center">Expense splitting for groups. Nothing more.</p>
 
 <p align="center">
-
-
-
+<!-- <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yml"> -->
+<!-- <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Importantus/coinsaw"> -->
+<img alt="GitHub" src="https://img.shields.io/github/license/Importantus/coinsaw">
 </p>
 
 > [!WARNING]
