@@ -5,7 +5,7 @@
 <p align="center">Expense splitting for groups. Nothing more.</p>
 
 <p align="center">
-<!-- <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yaml"> -->
+<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yaml">
 <!-- <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Importantus/coinsaw"> -->
 <img alt="GitHub" src="https://img.shields.io/github/license/Importantus/coinsaw">
 </p>
@@ -15,7 +15,7 @@
 
 Coinsaw is an app used to track and split expenses within groups. It works fully offline but allows for optional [synchronization with a server](https://github.com/Importantus/coinsaw-backend).
 
-I built this app mainly to learn Jetpack Compose and as an alternative to Splitwise (which costs money since autumn 2023).
+I built this app mainly to learn Jetpack Compose and as an alternative to Splitwise ([which costs money since autumn 2023](https://www.old.reddit.com/r/androidapps/comments/17prad3/splitwise_is_now_useless_without_pro/)).
 
 <img alt="Mockup_Coinsaw" src="https://github.com/user-attachments/assets/9f0817ce-4188-4d3f-9217-ca95b9e9faeb">
 
