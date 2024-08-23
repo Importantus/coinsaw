@@ -6,7 +6,7 @@
 
 <p align="center">
 <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yaml">
-<!-- <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Importantus/coinsaw"> -->
+<img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Importantus/coinsaw?include_prereleases">
 <img alt="GitHub" src="https://img.shields.io/github/license/Importantus/coinsaw">
 </p>
 
