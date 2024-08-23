@@ -37,14 +37,14 @@
     <string name="settle_up_specifically">Zahle das zurück</string>
     <string name="by">von</string>
     <string name="you_lent">du leihst</string>
-    <string name="you_borrowed">du leihst dir</string>
+    <string name="you_borrowed">du schuldest</string>
     <string name="add_transaction">Überweisung hinzufügen</string>
     <string name="no_bills_yet">Du hast noch keine Ausgaben hinzugefügt</string>
     <string name="screen_make_online_title">Synchronisierung einschalten</string>
     <string name="server_url">Server Url</string>
     <string name="recovery_token">Wiederherstellungsschlüssel</string>
     <string name="recovery_token_description">Speichere den folgenden Schlüssel an einem sicheren Ort! Damit kannst du jederzeit neue Sitzungen mit Admin-Rechten für deine Gruppe erstellen.</string>
-    <string name="initial_sync">Synchronisiere die Gruppe das erste Mal. Das kann ein bisschen dauern.</string>
+    <string name="initial_sync">Die Gruppe wird das erste Mal synchronisiert. Das kann ein bisschen dauern.</string>
     <string name="screen_join_group_title">Gruppe beitreten</string>
     <string name="share_token">Freigabeschlüssel</string>
     <string name="paste_key_here">Füge den Key hier ein</string>
@@ -64,7 +64,7 @@
     <string name="screen_group_edit_title">Gruppeneinstellungen</string>
     <string name="delete">Löschen</string>
     <string name="delete_group">Gruppe löschen</string>
-    <string name="delete_group_confirmation">Möchtes du die Gruppe wirklich löschen? Im Moment kannst du sie nur lokal löschen. Eventuelle synchronisierte Inhalte verbleiben auf dem Server.</string>
+    <string name="delete_group_confirmation">Möchtest du die Gruppe wirklich löschen? Im Moment kannst du sie nur lokal löschen. Eventuelle, synchronisierte Inhalte verbleiben auf dem Server.</string>
     <string name="edit_group_menu_item">Gruppe bearbeiten</string>
     <string name="screen_missing_token_title">Wiederherstellungsschlüssel</string>
     <string name="enter_share_token_desc">Du solltest eine lange, kryptische Zeichenfolge bekommen haben. Das ist ein Schlüssel, mit dem du der Gruppe beitreten kannst.</string>
@@ -72,7 +72,7 @@
     <string name="screen_join_group_big_title">Schlüssel einfügen</string>
     <string name="ok">OK</string>
     <string name="network_error">Syncfehler</string>
-    <string name="error_400">Der Server konnte die Anfrage nicht verstehen. Überprüfe deine Eingaben</string>
+    <string name="error_400">Der Server konnte die Anfrage nicht verstehen. Überprüfe deine Eingaben.</string>
     <string name="error_401">Deine Anmeldedaten sind falsch. Du hast hier keinen Zugang.</string>
     <string name="error_403">Du hast nicht die Berechtigung, hierauf zuzugreifen.</string>
     <string name="error_404">Ups. Die Daten können nicht gefunden werden.</string>
@@ -82,7 +82,7 @@
     <string name="incorrect_share_token_desc">Dein Schlüssel funktioniert nicht. Überprüf ihn nochmal!</string>
     <string name="network_error_desc">Du scheinst eine instabile Netzwerkverbindung zu haben. Bitte versuche es später nochmal.</string>
     <string name="unknown_error_desc">Irgendwas schlimmes ist passiert. Informiere deinen Admin, wenn es nochmal passiert!</string>
-    <string name="wrong_url_err">Entweder hast du keine Netzwerkverbindung, oder die URL, die du eingegeben hast, ist falsch.</string>
+    <string name="wrong_url_err">Entweder hast du keine Netzwerkverbindung oder die URL, die du eingegeben hast, ist falsch.</string>
     <string name="group_restart_initial_sync">Erste Synchronisation neu starten</string>
     <string name="group_restart_initial_sync_desc">Etwas ist schief gelaufen, als du die Synchronisation angeschaltet hast. Versuch es erneut.</string>
     <string name="add_first_bill">Füge deine erste Ausgabe hinzu</string>
@@ -91,5 +91,5 @@
     <string name="screen_bill_details_title">Ausgabe</string>
     <string name="delete_expense">Ausgabe löschen</string>
     <string name="delete_expense_desc">Willst du diese Ausgabe wirklich löschen?</string>
-    <string name="not_involved">Nicht beiteiligt</string>
+    <string name="not_involved">Nicht beteiligt</string>
 </resources>
