@@ -2,10 +2,8 @@ name: Build & Publish Release APK
 
 on:
   push:
-    # branches: ["master"]
-
-    # tags:
-    #   - "*"
+    tags:
+      - "*"
 
 jobs:
   Gradle:
@@ -24,13 +22,13 @@ jobs:
         with:
           project-path: .
           ruby-version: "3.3.0" # This is only set because there is some random issues with the default ruby version. See https://github.com/fastlane/fastlane/issues/21942
-          output-path: coinsaw-xxx.apk
+          output-path: coinsaw-${{ github.ref_name }}.apk
       - name: Release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: xxx
+          automatic_release_tag: ${{ github.ref_name }}
           draft: true
-          title: xxx
+          title: ${{ github.ref_name }}
           files: |
-            coinsaw-xxx.apk
+            coinsaw-${{ github.ref_name }}.apk
