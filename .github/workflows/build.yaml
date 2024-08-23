@@ -31,8 +31,7 @@ jobs:
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
 
         run: |
-          echo $ENCODED_STRING > keystore-b64.txt
-          base64 -d keystore-b64.txt > keystore.jks
+          echo $ENCODED_STRING > base64 -d > coinsaw.jks
 
       - name: Build Release apk
         env:
