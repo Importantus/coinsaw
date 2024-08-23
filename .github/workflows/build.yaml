@@ -6,6 +6,7 @@ on:
       - "*"
 
 jobs:
+  # See https://medium.com/@dcostalloyd90/automating-android-builds-with-github-actions-a-step-by-step-guide-2a02a54f59cd
   Gradle:
     runs-on: ubuntu-latest
     steps:
