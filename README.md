@@ -5,7 +5,7 @@
 <p align="center">Expense splitting for groups. Nothing more.</p>
 
 <p align="center">
-<!-- <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yml"> -->
+<!-- <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Importantus/coinsaw/build.yaml"> -->
 <!-- <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Importantus/coinsaw"> -->
 <img alt="GitHub" src="https://img.shields.io/github/license/Importantus/coinsaw">
 </p>
@@ -34,6 +34,22 @@ You can find the server [here](https://github.com/Importantus/coinsaw-backend). 
 ### Auth
 
 As mentioned earlier, the app doesn't require an account. Instead, when you enable syncing, you can create share tokens that you can share with other members. These tokens are used to create new sessions that then authenticate the clients. You can set per share token how often it can be used and if the sessions that are created with it are admin sessions. Admin sessions can edit the group, add or remove shares, and manage other sessions.
+
+## Development
+
+The app is built with Jetpack Compose and uses Room for the database. It also uses Hilt for dependency injection. The app is built with a MVVM architecture in mind.
+
+### Release 
+
+When you want to create a new release, follow these steps:
+
+1. Update the `versionName` (e.g. 1.2.3) and increase the `versionCode` (e.g. 3) in `app/build.gradle.kts` 
+1. Commit that change (`git commit -am v1.2.3`)
+1. Tag the commit (`git tag v1.2.3`). Make sure your tag name's format is `v*.*.*`
+1. Push the changes to GitHub (`git push && git push --tags`)
+1. Edit and publish the release draft created by the workflow in GitHub
+
+After building successfully, the action will publish the release artifacts in a new release draft that will be created on GitHub with download links for the app. 
 
 ## Contributing
 
