@@ -92,4 +92,7 @@
     <string name="delete_expense">Ausgabe löschen</string>
     <string name="delete_expense_desc">Willst du diese Ausgabe wirklich löschen?</string>
     <string name="not_involved">Nicht beteiligt</string>
+    <string name="screen_add_transaction_title">Neue Überweisung</string>
+    <string name="transaction_sent">zahlte</string>
+    <string name="error_transaction_create">Ups, da ist irgendwo ein Fehler. Überprüf deine Eingaben und versuche es nochmal!</string>
 </resources>

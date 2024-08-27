@@ -93,4 +93,7 @@
     <string name="delete_expense">Delete expense</string>
     <string name="delete_expense_desc">Do you really want to delete this expense?</string>
     <string name="not_involved">Not involved</string>
+    <string name="screen_add_transaction_title">Add transaction</string>
+    <string name="transaction_sent">sent</string>
+    <string name="error_transaction_create">There was an error. Check your inputs and try again.</string>
 </resources>
