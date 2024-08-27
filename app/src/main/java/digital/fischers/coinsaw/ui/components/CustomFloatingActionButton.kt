@@ -22,7 +22,7 @@ fun CustomFloatingActionButton(
     FloatingActionButton(
         onClick = onClick,
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.secondary
+        contentColor = MaterialTheme.colorScheme.onPrimary
     ) {
         when (type) {
             CustomFloatingActionButtonType.CONFIRM -> {

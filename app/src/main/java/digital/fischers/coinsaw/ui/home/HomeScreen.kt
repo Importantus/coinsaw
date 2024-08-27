@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
+import digital.fischers.coinsaw.ui.theme.neutral
 import digital.fischers.coinsaw.ui.viewModels.HomeViewModel
 import java.util.Locale
 
@@ -57,7 +58,7 @@ fun HomeScreen(
             Column {
                 Text(
                     text = stringResource(id = R.string.screen_title_groups), style = TextStyle(
-                        fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White
+                        fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.neutral
                     )
                 )
             }
@@ -205,7 +206,7 @@ fun GroupCard(
             Column {
                 Text(
                     text = groupUiState.name, style = TextStyle(
-                        fontSize = 20.sp, fontWeight = FontWeight.Medium, color = Color.White
+                        fontSize = 20.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.neutral
                     )
                 )
                 Spacer(modifier = Modifier.height(6.dp))

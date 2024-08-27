@@ -30,6 +30,7 @@ import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.DeleteModal
+import digital.fischers.coinsaw.ui.theme.neutral
 import digital.fischers.coinsaw.ui.utils.getDate
 import digital.fischers.coinsaw.ui.viewModels.BillDetailsViewModel
 import kotlinx.coroutines.launch
@@ -73,7 +74,7 @@ fun BillDetailsScreen(
                 style = TextStyle(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.neutral
                 )
             )
 

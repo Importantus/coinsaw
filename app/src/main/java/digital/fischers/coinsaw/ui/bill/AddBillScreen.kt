@@ -190,7 +190,7 @@ fun AddBillScreen(
                         modifier = Modifier.padding(horizontal = 34.dp, vertical = 4.dp),
                         text = stringResource(id = R.string.add_expense_save),
                         style = TextStyle(
-                            color = MaterialTheme.colorScheme.surface,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium
                         )

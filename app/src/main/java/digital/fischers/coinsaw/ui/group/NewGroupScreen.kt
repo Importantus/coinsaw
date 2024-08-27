@@ -2,6 +2,7 @@ package digital.fischers.coinsaw.ui.group
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +19,7 @@ import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.theme.neutral
 import digital.fischers.coinsaw.ui.viewModels.NewGroupViewModel
 import kotlinx.coroutines.launch
 
@@ -60,7 +62,7 @@ fun NewGroupScreen(
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.neutral
             )
         )
 

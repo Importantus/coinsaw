@@ -53,6 +53,8 @@ import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
+import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
+import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
 import java.util.Date
@@ -214,20 +216,9 @@ fun GroupScreen(
         },
         floatingActionButton = {
             if (members.isNotEmpty()) {
-                FloatingActionButton(
-                    onClick = {
-                        onAddBillClicked(groupId)
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.secondary
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.icon_add),
-                        contentDescription = stringResource(
-                            id = R.string.add_bill
-                        )
-                    )
-                }
+                CustomFloatingActionButton(onClick = {
+                    onAddBillClicked(groupId)
+                }, type = CustomFloatingActionButtonType.ADD)
             }
         },
         title = group.name
@@ -292,7 +283,7 @@ fun GroupScreen(
                             text = stringResource(id = R.string.add_first_bill), style = TextStyle(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.background
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                     }
@@ -785,7 +776,7 @@ fun NoMembers(onAddMemberClicked: () -> Unit) {
                 text = stringResource(id = R.string.add_member), style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }

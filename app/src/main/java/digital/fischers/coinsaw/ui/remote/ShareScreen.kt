@@ -44,6 +44,7 @@ import digital.fischers.coinsaw.ui.components.CustomErrorAlert
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.CustomTextField
 import digital.fischers.coinsaw.ui.components.SettingCard
+import digital.fischers.coinsaw.ui.theme.neutral
 import digital.fischers.coinsaw.ui.viewModels.ShareViewModel
 import kotlinx.coroutines.launch
 
@@ -128,7 +129,7 @@ fun ShareForm(
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.neutral
             )
         )
         CustomTextField(
@@ -196,7 +197,7 @@ fun ShareForm(
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -214,7 +215,7 @@ fun ShareList(
         style = TextStyle(
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.neutral
         )
     )
     Spacer(modifier = Modifier.height(16.dp))
