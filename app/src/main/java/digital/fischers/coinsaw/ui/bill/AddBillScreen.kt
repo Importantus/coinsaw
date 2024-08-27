@@ -60,6 +60,7 @@ import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.components.MoneyInput
 import digital.fischers.coinsaw.ui.components.UserSelection
 import digital.fischers.coinsaw.ui.components.getBottomLineShape
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
@@ -135,7 +136,7 @@ fun AddBillScreen(
                         )
                     }
 
-                    AmountInput(onValueChanged = {
+                    MoneyInput(onValueChanged = {
                         viewModel.onAmountChanged(it)
                     }, value = state.amount, currency = group?.currency ?: "€")
                     TitleInput(onValueChanged = {
@@ -238,87 +239,6 @@ fun TitleInput(
                 )
             )
         }
-    }
-}
-
-@Composable
-fun AmountInput(
-    onValueChanged: (String) -> Unit,
-    value: String,
-    currency: String = "€"
-) {
-    val focusRequester = remember { FocusRequester() }
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface,
-                shape = getBottomLineShape(2.dp)
-            )
-            .clip(MaterialTheme.shapes.medium)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-            ) {
-                focusRequester.requestFocus()
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-        ) {
-            BasicTextField(
-                value = value,
-                singleLine = true,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                ),
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Light,
-                    fontSize = 48.sp
-                ),
-                onValueChange = { onValueChanged(it) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester)
-                    .background(Color.Transparent)
-                    .padding(8.dp)
-            )
-            if (value.isEmpty()) {
-                Text(
-                    text = "0.00", modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        fontWeight = FontWeight.Light,
-                        fontSize = 48.sp,
-                    ),
-                    overflow = TextOverflow.Clip,
-                    maxLines = 1
-                )
-            }
-        }
-        Text(
-            modifier = Modifier
-                .padding(end = 8.dp),
-            text = currency,
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Light,
-                fontSize = 40.sp
-            )
-        )
     }
 }
 
