@@ -233,8 +233,8 @@ fun GroupCard(
                     .clip(MaterialTheme.shapes.small)
                     .background(
                         when {
-                            groupUiState.balance > 0.0 -> MaterialTheme.colorScheme.secondaryContainer
-                            groupUiState.balance < 0.0 -> MaterialTheme.colorScheme.error
+                            groupUiState.balance > 0.009 -> MaterialTheme.colorScheme.secondaryContainer
+                            groupUiState.balance < 0.000 -> MaterialTheme.colorScheme.error
                             else -> MaterialTheme.colorScheme.secondary
                         }
                     )
