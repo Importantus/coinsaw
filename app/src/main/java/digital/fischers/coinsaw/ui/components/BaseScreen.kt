@@ -98,6 +98,8 @@ fun BaseScreen(
                 if(pullRefreshState != null) {
                     Log.d("BaseScreen", "pullRefreshState: $pullRefreshState")
                     PullRefreshIndicator(
+                        backgroundColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
                         state = pullRefreshState,
                         refreshing = refreshing,
                         modifier = Modifier
