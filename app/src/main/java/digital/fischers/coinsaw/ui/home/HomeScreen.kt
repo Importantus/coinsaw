@@ -62,11 +62,11 @@ fun HomeScreen(
                     )
                 )
             }
-            Icon(
-                painterResource(id = R.drawable.icon_settings), contentDescription = stringResource(
-                    id = R.string.screen_settings_title
-                )
-            )
+//            Icon(
+//                painterResource(id = R.drawable.icon_settings), contentDescription = stringResource(
+//                    id = R.string.screen_settings_title
+//                )
+//            )
         }
     }) {
         ContentWrapperWithFallback(groups, showCondition = groups.isNotEmpty(), fallback = {
