@@ -60,6 +60,7 @@ import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.components.UserSelection
 import digital.fischers.coinsaw.ui.components.getBottomLineShape
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import digital.fischers.coinsaw.ui.viewModels.AddBillViewModel
@@ -121,12 +122,12 @@ fun AddBillScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        UserSelectButton(
-                            onPayerChanged = {
+                        UserSelection(
+                            onSelectionChanged = {
                                 viewModel.onPayerChanged(it)
                             },
                             users = users,
-                            userName = viewModel.getUserById(state.payerId)?.name ?: ""
+                            selectedUserName = viewModel.getUserById(state.payerId)?.name ?: ""
                         )
                         Text(
                             text = stringResource(id = R.string.add_expense_user_payed) + "...",
@@ -431,82 +432,3 @@ fun SplittingElement(
     }
 }
 
-@Composable
-fun UserSelectButton(
-    onPayerChanged: (String) -> Unit,
-    users: List<User>,
-    userName: String,
-    modifier: Modifier = Modifier
-) {
-    var userSelectPopUpVisible by remember {
-        mutableStateOf(false)
-    }
-
-    Box {
-        Row(
-            modifier = modifier
-                .clip(MaterialTheme.shapes.small)
-                .clickable { userSelectPopUpVisible = true }
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 4.dp, horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = userName,
-                modifier = Modifier
-                    .weight(1f, fill = false)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.icon_arrow_down),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp)
-            )
-        }
-
-        UserSelectPopup(
-            visible = userSelectPopUpVisible,
-            onDismissRequest = { userSelectPopUpVisible = false },
-            users = users,
-            onUserSelected = {
-                onPayerChanged(it.id)
-            })
-    }
-}
-
-@Composable
-fun UserSelectPopup(
-    visible: Boolean,
-    onDismissRequest: () -> Unit,
-    users: List<User>,
-    onUserSelected: (User) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    if (visible) {
-        Popup(
-            onDismissRequest = onDismissRequest,
-            alignment = Alignment.TopCenter,
-            offset = IntOffset(0, 80),
-        ) {
-            Column(
-                modifier = modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .heightIn(0.dp, 100.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                users.forEach {
-                    Text(
-                        text = it.name,
-                        modifier = Modifier
-                            .clickable {
-                                onUserSelected(it)
-                                onDismissRequest()
-                            }
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
-            }
-        }
-    }
-}
