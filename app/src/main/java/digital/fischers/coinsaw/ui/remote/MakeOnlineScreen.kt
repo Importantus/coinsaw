@@ -32,6 +32,7 @@ import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.CustomTextField
+import digital.fischers.coinsaw.ui.components.ErrorBox
 import digital.fischers.coinsaw.ui.viewModels.MakeOnlineViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -73,27 +74,8 @@ fun MakeOnlineScreen(
             }
         }
     ) {
-        if(wrongServerUrl) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.error)
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.icon_info),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onError
-                )
-                Text(
-                    text = stringResource(id = R.string.wrong_url_err),
-                    modifier = Modifier.padding(start = 8.dp),
-                    color = MaterialTheme.colorScheme.onError,
-                    lineHeight = 20.sp
-                )
-            }
+        if (wrongServerUrl) {
+            ErrorBox(message = stringResource(id = R.string.wrong_url_err))
             Spacer(modifier = Modifier.height(12.dp))
         }
 
