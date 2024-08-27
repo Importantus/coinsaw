@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.data.remote.Share
 import digital.fischers.coinsaw.ui.components.BaseScreen
+import digital.fischers.coinsaw.ui.components.CustomErrorAlert
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.CustomTextField
 import digital.fischers.coinsaw.ui.components.SettingCard
@@ -54,6 +55,8 @@ fun ShareScreen(
 ) {
     val groupId = viewModel.groupId
     val loading = viewModel.loading
+    val loadError = viewModel.loadSharesError
+    val createError = viewModel.createShareError
 
     val newShareName by viewModel.newShareName.collectAsState()
     val newShareAdmin by viewModel.newShareAdmin.collectAsState()
@@ -71,6 +74,14 @@ fun ShareScreen(
         },
         blockingLoading = loading
     ) {
+        if(loadError != null) {
+            CustomErrorAlert(error = loadError, onConfirm = onBackNavigation)
+        }
+
+        if(createError != null) {
+            CustomErrorAlert(error = createError, onConfirm = {})
+        }
+
         Column {
             ShareForm(
                 newShareName = newShareName,

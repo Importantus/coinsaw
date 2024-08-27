@@ -61,6 +61,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomButton
+import digital.fischers.coinsaw.ui.components.CustomErrorAlert
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.Result
 import digital.fischers.coinsaw.ui.components.TokenDisplay
@@ -78,6 +79,8 @@ fun ShareDetailsScreen(
 ) {
     val share = viewModel.share
     val loading = viewModel.loading
+    val loadError = viewModel.loadError
+    val deleteError = viewModel.deleteError
 
     BaseScreen(
         appBar = {
@@ -92,6 +95,14 @@ fun ShareDetailsScreen(
         blockingLoading = loading,
         title = share?.name ?: "",
     ) {
+        if(loadError != null) {
+            CustomErrorAlert(error = loadError, onConfirm = onBackNavigation)
+        }
+
+        if(deleteError != null) {
+            CustomErrorAlert(error = deleteError, onConfirm = {})
+        }
+
         if (share != null) {
             Text(text = stringResource(id = R.string.share_details_sessions_created) + ": ${share.sessions.size}/${share.maxSessions}")
             Spacer(modifier = Modifier.height(32.dp))

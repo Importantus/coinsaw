@@ -28,13 +28,10 @@ class ShareViewModel @Inject constructor(
     var loading by mutableStateOf(true)
         private set
 
-    var networkError by mutableStateOf(false)
+    var loadSharesError: APIError? by mutableStateOf(null)
         private set
 
-    var errorLoadingShares: Int? by mutableStateOf(null)
-        private set
-
-    var errorCreatingShare: Int? by mutableStateOf(null)
+    var createShareError: APIError? by mutableStateOf(null)
         private set
 
     private var _existingShares = MutableStateFlow(emptyList<Share>())
@@ -75,22 +72,12 @@ class ShareViewModel @Inject constructor(
 
         when (shareResponse) {
             is APIResult.Error -> {
-                when (shareResponse.exception) {
-                    is APIError.CustomError -> {
-                        errorCreatingShare = shareResponse.exception.code
-                    }
-                    APIError.NetworkError -> {
-                        networkError = true
-                    }
-                    APIError.UnknownError -> {
-                        networkError = true
-                    }
-                }
+                createShareError = shareResponse.exception
                 loading = false
                 return null
             }
             is APIResult.Success -> {
-                errorCreatingShare = null
+                createShareError = null
                 _newShareAdmin.value = false
                 _newShareMaxSessions.value = "1"
                 _newShareName.value = ""
@@ -105,21 +92,11 @@ class ShareViewModel @Inject constructor(
         loading = true
         val shares = when (val sharesResponse = remoteRepository.getAllShares(groupId)) {
             is APIResult.Error -> {
-                when (sharesResponse.exception) {
-                    is APIError.CustomError -> {
-                        errorLoadingShares = sharesResponse.exception.code
-                    }
-                    APIError.NetworkError -> {
-                        networkError = true
-                    }
-                    APIError.UnknownError -> {
-                        networkError = true
-                    }
-                }
+                loadSharesError = sharesResponse.exception
                 null
             }
             is APIResult.Success -> {
-                errorLoadingShares = null
+                loadSharesError = null
                 sharesResponse.data
             }
         }

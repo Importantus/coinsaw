@@ -1,7 +1,5 @@
 package digital.fischers.coinsaw.ui.viewModels
 
-import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,8 +13,6 @@ import digital.fischers.coinsaw.data.remote.ShareWithToken
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.launch
-import qrcode.QRCode
-import qrcode.color.Colors
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,10 +26,10 @@ class ShareDetailsViewModel @Inject constructor(
     var loading by mutableStateOf(false)
         private set
 
-    var networkError by mutableStateOf(false)
+    var loadError: APIError? by mutableStateOf(null)
         private set
 
-    var error: Int? by mutableStateOf(null)
+    var deleteError: APIError? by mutableStateOf(null)
         private set
 
     var share: ShareWithToken? by mutableStateOf(null)
@@ -49,20 +45,10 @@ class ShareDetailsViewModel @Inject constructor(
         loading = true
         when (val shareResponse = remoteRepository.getShare(groupId, shareId)) {
             is APIResult.Error -> {
-                when (shareResponse.exception) {
-                    is APIError.CustomError -> {
-                        error = shareResponse.exception.code
-                    }
-                    APIError.NetworkError -> {
-                        networkError = true
-                    }
-                    APIError.UnknownError -> {
-                        networkError = true
-                    }
-                }
+                loadError = shareResponse.exception
             }
             is APIResult.Success -> {
-                error = null
+                loadError = null
                 share = shareResponse.data
             }
         }
@@ -76,14 +62,10 @@ class ShareDetailsViewModel @Inject constructor(
 
         when (shareResponse) {
             is APIResult.Error -> {
-                when (shareResponse.exception) {
-                    is APIError.CustomError -> error = shareResponse.exception.code
-                    APIError.NetworkError -> networkError = true
-                    APIError.UnknownError -> networkError = true
-                }
+                deleteError = shareResponse.exception
             }
             is APIResult.Success -> {
-                error = null
+                deleteError = null
             }
         }
 
