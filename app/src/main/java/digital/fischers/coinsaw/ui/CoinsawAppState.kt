@@ -6,6 +6,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
@@ -78,6 +80,12 @@ sealed class Screen(val route: String) {
         fun createRoute(groupId: String, billId: String) = "group/$groupId/bill/$billId"
     }
 
+    data object CreateTransaction: Screen("group/{$ARG_GROUP_ID}/createTransaction/{$ARGS_CREATE_TRANSACTION}") {
+        fun createRoute(groupId: String, args: AddTransactionArguments): String {
+            return "group/$groupId/createTransaction/" + Gson().toJson(args)
+        }
+    }
+
     companion object {
         const val ARG_GROUP_ID = "groupId"
         const val ARG_USER_ID = "userId"
@@ -87,6 +95,7 @@ sealed class Screen(val route: String) {
         const val ARG_BILL_ID = "billId"
         const val ARG_SHARE_TOKEN_ERROR = "shareTokenError"
         const val ARG_GROUP_MISSING_SESSION_ERROR = "groupMissingSessionError"
+        const val ARGS_CREATE_TRANSACTION = "createTransaction"
     }
 }
 
@@ -181,6 +190,10 @@ class CoinsawAppState(
 
     fun navigateToBillDetails(groupId: String, billId: String) {
         navigateBackstackAware(Screen.BillDetails.createRoute(groupId, billId), Screen.BillDetails)
+    }
+
+    fun navigateToCreateTransaction(groupId: String, args: AddTransactionArguments) {
+        navigateBackstackAware(Screen.CreateTransaction.createRoute(groupId, args), Screen.CreateTransaction)
     }
 
     fun navigateBack() {

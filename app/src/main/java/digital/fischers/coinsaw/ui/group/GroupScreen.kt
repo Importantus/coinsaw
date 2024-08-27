@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,12 +49,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
+import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
-import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
@@ -82,7 +83,7 @@ fun GroupScreen(
     onAddMemberClicked: (String) -> Unit,
     onBillClicked: (groupId: String, billId: String) -> Unit,
     onAddBillClicked: (groupId: String) -> Unit,
-    onAddTransactionClicked: (groupId: String, amount: String?, payer: String?, payee: String?) -> Unit,
+    onAddTransactionClicked: (groupId: String, args: AddTransactionArguments) -> Unit,
     onTransactionClicked: (groupId: String, billId: String) -> Unit,
     onSettleUpClicked: (String) -> Unit,
     onNoSessionNavigation: () -> Unit,
@@ -328,9 +329,11 @@ fun GroupScreen(
                                             onClick = {
                                                 onAddTransactionClicked(
                                                     groupId,
-                                                    transaction.id,
-                                                    payer.id,
-                                                    payee.id
+                                                    AddTransactionArguments(
+                                                        payeeId = payee.id,
+                                                        payerId = payer.id,
+                                                        amount = transaction.amount.toString()
+                                                    )
                                                 )
                                             }
                                         )
@@ -350,9 +353,11 @@ fun GroupScreen(
                                             onClick = {
                                                 onAddTransactionClicked(
                                                     groupId,
-                                                    transaction.id,
-                                                    payer.id,
-                                                    payee.id
+                                                    AddTransactionArguments(
+                                                        payeeId = payee.id,
+                                                        payerId = payer.id,
+                                                        amount = transaction.amount.toString()
+                                                    )
                                                 )
                                             }
                                         )
@@ -378,12 +383,14 @@ fun GroupScreen(
                             bill.created
                         ) {
                             val payer by bill.payer!!.collectAsState()
+
                             if (bill.name.isBlank() && bill.splitting.size == 1) {
+                                val payee by bill.splitting.first().user.collectAsState()
                                 TransactionElement(
                                     currency = group.currency,
                                     payer = payer,
                                     amount = bill.amount,
-                                    payee = bill.splitting.first().user,
+                                    payee = payee,
                                     onClick = { onTransactionClicked(groupId, bill.id) }
                                 )
                             } else {
@@ -723,10 +730,22 @@ fun TransactionElement(
     currency: String,
     payer: GroupScreenUiStates.User,
     amount: Double,
-    payee: StateFlow<GroupScreenUiStates.User>,
+    payee: GroupScreenUiStates.User,
     onClick: () -> Unit
 ) {
-    Text(text = "TransactionElement yet to be implemented")
+    val money = "%.2f".format(abs(amount)) + " " + currency
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.icon_money),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+        Text(text = "${payer.name} ${stringResource(id = R.string.transaction_sent)} ${payee.name} $money")
+    }
+
 }
 
 @Composable
