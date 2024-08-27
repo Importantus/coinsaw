@@ -56,6 +56,7 @@ import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.theme.successText
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
 import java.util.Date
 import java.util.Locale
@@ -700,7 +701,7 @@ fun BillElement(
                     text = "%.2f".format(abs(displayedAmount)) + " " + currency,
                     style = TextStyle(
                         fontSize = 16.sp,
-                        color = if (displayedAmount > 0) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.error
+                        color = if (displayedAmount > 0) MaterialTheme.colorScheme.successText else MaterialTheme.colorScheme.error
                     )
                 )
             }

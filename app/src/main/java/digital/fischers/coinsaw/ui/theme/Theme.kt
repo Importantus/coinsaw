@@ -35,12 +35,17 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = Color(0xFFA5B4BB),
     background = Color(0xFFD1DADA),
     error = Color(0xfffd7374),
-    secondaryContainer = Color(0xFF36AD53),
+    secondaryContainer = Color(0xFF5DAA71),
     onBackground = Color(0xFF3D3F41),
     onPrimary = Color(0xFF56575A)
 )
 
-val ColorScheme.neutral: Color @Composable get() = if (!isSystemInDarkTheme()) Color(0xFF333333) else Color(0xFFf5f5f5)
+val ColorScheme.neutral: Color
+    @Composable get() = if (!isSystemInDarkTheme()) Color(0xFF333333) else Color(
+        0xFFf5f5f5
+    )
+val ColorScheme.successText: Color
+    @Composable get() = if (!isSystemInDarkTheme()) Color(0xFF36AD53) else Color(0xFF1B7731)
 
 @Composable
 fun CoinsawTheme(

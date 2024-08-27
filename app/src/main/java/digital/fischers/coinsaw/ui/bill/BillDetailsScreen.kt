@@ -31,6 +31,7 @@ import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.DeleteModal
 import digital.fischers.coinsaw.ui.theme.neutral
+import digital.fischers.coinsaw.ui.theme.successText
 import digital.fischers.coinsaw.ui.utils.getDate
 import digital.fischers.coinsaw.ui.viewModels.BillDetailsViewModel
 import kotlinx.coroutines.launch
@@ -94,7 +95,7 @@ fun BillDetailsScreen(
                     val payer by bill!!.payer!!.collectAsState()
                     Text(text = payer.name)
                     Text(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        color = MaterialTheme.colorScheme.successText,
                         text = "%.2f".format(bill!!.amount) + " " + group.currency
                     )
                 }
