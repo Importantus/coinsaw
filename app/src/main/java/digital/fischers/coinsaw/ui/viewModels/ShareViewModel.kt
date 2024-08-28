@@ -60,6 +60,12 @@ class ShareViewModel @Inject constructor(
         _newShareMaxSessions.value = numberString
     }
 
+    fun load() {
+        viewModelScope.launch {
+            _existingShares.value = loadAllShares() ?: emptyList()
+        }
+    }
+
     suspend fun createShare(): CreateShareResponse? {
         loading = true
         val shareResponse = remoteRepository.createShare(
@@ -103,11 +109,5 @@ class ShareViewModel @Inject constructor(
 
         loading = false
         return shares
-    }
-
-    init {
-        viewModelScope.launch {
-            _existingShares.value = loadAllShares() ?: emptyList()
-        }
     }
 }
