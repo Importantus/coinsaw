@@ -31,8 +31,7 @@ interface Api {
     @DELETE
     suspend fun deleteSession(
         @Url url: String,
-        @Header("Authorization") adminSessionToken: String,
-        @Path("id") id: String
+        @Header("Authorization") adminSessionToken: String
     ): Response<Unit>
 
     @POST
@@ -54,8 +53,7 @@ interface Api {
     @DELETE
     suspend fun deleteShare(
         @Url url: String,
-        @Header("Authorization") adminSessionToken: String,
-        @Path("id") id: String
+        @Header("Authorization") adminSessionToken: String
     ): Response<Unit>
 
     @POST

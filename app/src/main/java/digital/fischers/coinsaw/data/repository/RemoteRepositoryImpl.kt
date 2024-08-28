@@ -182,9 +182,8 @@ class RemoteRepositoryImpl @Inject constructor(
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiCall {
             api.deleteShare(
-                appendToServerUrl(serverUrl, ApiPath.DELETE_SHARE),
-                accessToken,
-                shareId
+                appendToServerUrl(serverUrl, ApiPath.DELETE_SHARE) + "/${shareId}",
+                accessToken
             )
         }
     }
@@ -262,9 +261,8 @@ class RemoteRepositoryImpl @Inject constructor(
         val (accessToken, serverUrl) = getAccessTokenAndServerUrl(groupId)
         return apiCall {
             api.deleteSession(
-                appendToServerUrl(serverUrl, ApiPath.DELETE_SESSION),
-                accessToken,
-                sessionId
+                appendToServerUrl(serverUrl, ApiPath.DELETE_SESSION) + "/${sessionId}",
+                accessToken
             )
         }
     }
