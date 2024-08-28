@@ -24,7 +24,7 @@ suspend fun <T : Any> apiCall(call: suspend () -> Response<T>): APIResult<T> {
             )
         } else {
             return if (response.body() == null) {
-                APIResult.Error(APIError.UnknownError)
+                APIResult.Success(Unit as T)
             } else {
                 APIResult.Success(response.body()!!)
             }
