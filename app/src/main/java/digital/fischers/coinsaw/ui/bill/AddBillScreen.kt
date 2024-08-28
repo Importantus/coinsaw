@@ -335,6 +335,7 @@ fun SplittingElement(
                     onValueChange = { onSplittingChanged(splitting.userId, it) },
                     modifier = Modifier
                         .weight(1f)
+                        .focusRequester(focusRequester)
                 )
 
                 Text(
