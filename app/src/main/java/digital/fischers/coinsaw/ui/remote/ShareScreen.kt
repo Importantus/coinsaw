@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -24,8 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -75,11 +77,11 @@ fun ShareScreen(
         },
         blockingLoading = loading
     ) {
-        if(loadError != null) {
+        if (loadError != null) {
             CustomErrorAlert(error = loadError, onConfirm = onBackNavigation)
         }
 
-        if(createError != null) {
+        if (createError != null) {
             CustomErrorAlert(error = createError, onConfirm = {})
         }
 
@@ -219,10 +221,12 @@ fun ShareList(
         )
     )
     Spacer(modifier = Modifier.height(16.dp))
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        existingShares.forEach { share ->
+
+        items(existingShares.size) { index ->
+            val share = existingShares[index]
             ShareListItem(
                 share = share,
                 onShareClicked = { navigateToShareDetails(groupId, share.id) }
@@ -238,30 +242,57 @@ fun ShareListItem(share: Share, onShareClicked: () -> Unit) {
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surface)
-            .clickable { onShareClicked() }
-            .padding(16.dp),
+            .clickable { if (share.active) onShareClicked() }
+            .padding(16.dp)
+            .alpha(if (share.active) 1f else 0.6f),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
         ) {
-            Text(text = share.name)
-            if (share.admin) {
-                Text(
-                    text = stringResource(id = R.string.share_admin),
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.background
-                    ),
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .padding(4.dp, 2.dp)
-                )
+            Text(text = share.name, overflow = TextOverflow.Ellipsis, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+            Row {
+                if (share.admin) {
+                    Text(
+                        text = stringResource(id = R.string.share_admin),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.background
+                        ),
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(4.dp, 2.dp)
+                    )
+                }
+                if (!share.active) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = stringResource(id = R.string.share_inactive),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.background
+                        ),
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.error)
+                            .padding(4.dp, 2.dp)
+                    )
+                }
             }
+
         }
-        Icon(painter = painterResource(id = R.drawable.icon_arrow_right), contentDescription = null)
+        if (share.active) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.icon_arrow_right),
+                contentDescription = null
+            )
+        }
     }
 }
