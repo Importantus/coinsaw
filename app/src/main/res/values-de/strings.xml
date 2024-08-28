@@ -95,4 +95,6 @@
     <string name="screen_add_transaction_title">Neue Überweisung</string>
     <string name="transaction_sent">zahlte</string>
     <string name="error_transaction_create">Ups, da ist irgendwo ein Fehler. Überprüf deine Eingaben und versuche es nochmal!</string>
+    <string name="share_inactive">Inaktiv</string>
+    <string name="share_details_delete">Freigabe löschen</string>
 </resources>

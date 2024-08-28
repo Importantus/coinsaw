@@ -96,4 +96,6 @@
     <string name="screen_add_transaction_title">Add transaction</string>
     <string name="transaction_sent">sent</string>
     <string name="error_transaction_create">There was an error. Check your inputs and try again.</string>
+    <string name="share_inactive">Deactivated</string>
+    <string name="share_details_delete">Deactivate share</string>
 </resources>

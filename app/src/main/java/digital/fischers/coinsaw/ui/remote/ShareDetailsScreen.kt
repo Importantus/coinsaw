@@ -26,7 +26,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,6 +86,8 @@ fun ShareDetailsScreen(
     val loadError = viewModel.loadError
     val deleteError = viewModel.deleteError
 
+    val coroutineScope = rememberCoroutineScope()
+
     BaseScreen(
         appBar = {
             CustomNavigationBar(
@@ -95,20 +101,44 @@ fun ShareDetailsScreen(
         blockingLoading = loading,
         title = share?.name ?: "",
     ) {
-        if(loadError != null) {
+        if (loadError != null) {
             CustomErrorAlert(error = loadError, onConfirm = onBackNavigation)
         }
 
-        if(deleteError != null) {
-            CustomErrorAlert(error = deleteError, onConfirm = {})
+        if (deleteError != null) {
+            CustomErrorAlert(error = deleteError, onConfirm = onBackNavigation)
         }
 
         if (share != null) {
-            Text(text = stringResource(id = R.string.share_details_sessions_created) + ": ${share.sessions.size}/${share.maxSessions}")
-            Spacer(modifier = Modifier.height(32.dp))
-            QrBox(string = share.token)
-            Spacer(modifier = Modifier.height(16.dp))
-            TokenDisplay(token = share.token)
+            LazyColumn {
+                item {
+                    Text(text = stringResource(id = R.string.share_details_sessions_created) + ": ${share.sessions.size}/${share.maxSessions}")
+                    Spacer(modifier = Modifier.height(32.dp))
+                    QrBox(string = share.token)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TokenDisplay(token = share.token)
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val result = viewModel.deleteShare()
+                                if (result) {
+                                    onBackNavigation()
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    )
+                    {
+                        Text(text = stringResource(id = R.string.share_details_delete))
+                    }
+                }
+            }
         }
     }
 }
@@ -135,7 +165,7 @@ fun QrCode(string: String, modifier: Modifier = Modifier, color: Int = Colors.WH
             else -> null
         }
     }
-    if(bitmap != null) {
+    if (bitmap != null) {
         Image(
             bitmap = bitmap,
             contentDescription = null,
