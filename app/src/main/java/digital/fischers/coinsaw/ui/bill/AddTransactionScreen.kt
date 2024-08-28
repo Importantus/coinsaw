@@ -78,7 +78,7 @@ fun AddTransactionScreen(
             Spacer(modifier = Modifier.height(40.dp))
             UserSelection(
                 onSelectionChanged = {
-                    viewModel.setPayeeId(it)
+                    viewModel.setPayerId(it)
                 },
                 users = users,
                 selectedUserName = viewModel.getPayer()?.name ?: ""
@@ -107,7 +107,7 @@ fun AddTransactionScreen(
 
             UserSelection(
                 onSelectionChanged = {
-                    viewModel.setPayerId(it)
+                    viewModel.setPayeeId(it)
                 },
                 users = users,
                 selectedUserName = viewModel.getPayee()?.name ?: ""
