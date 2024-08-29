@@ -31,6 +31,7 @@ import digital.fischers.coinsaw.ui.members.MemberlistScreen
 import digital.fischers.coinsaw.ui.remote.EnterShareTokenScreen
 import digital.fischers.coinsaw.ui.remote.InitialSyncScreen
 import digital.fischers.coinsaw.ui.remote.MakeOnlineScreen
+import digital.fischers.coinsaw.ui.remote.SessionsScreen
 import digital.fischers.coinsaw.ui.remote.ShareDetailsScreen
 import digital.fischers.coinsaw.ui.remote.ShareScreen
 import digital.fischers.coinsaw.ui.remote.ShowRecoveryTokenScreen
@@ -156,6 +157,9 @@ fun CoinsawApp(
                     },
                     onSharesClicked = {
                         appState.navigateToShares(it)
+                    },
+                    onSessionsClicked = {
+                        appState.navigateToSessions(it)
                     },
                     onMakeOnlineClicked = {
                         appState.navigateToMakeOnline(it)
@@ -284,6 +288,12 @@ fun CoinsawApp(
             composable(Screen.CreateTransaction.route) {
                 AddTransactionScreen(onNavigateBack = { groupId ->
                     appState.navigateToGroup(groupId)
+                })
+            }
+
+            composable(Screen.Sessions.route) {
+                SessionsScreen(onBackNavigation = {
+                    appState.navigateBack()
                 })
             }
         }

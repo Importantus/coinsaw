@@ -86,6 +86,10 @@ sealed class Screen(val route: String) {
         }
     }
 
+    data object Sessions: Screen("group/{$ARG_GROUP_ID}/sessions") {
+        fun createRoute(groupId: String) = "group/$groupId/sessions"
+    }
+
     companion object {
         const val ARG_GROUP_ID = "groupId"
         const val ARG_USER_ID = "userId"
@@ -194,6 +198,10 @@ class CoinsawAppState(
 
     fun navigateToCreateTransaction(groupId: String, args: AddTransactionArguments) {
         navigateBackstackAware(Screen.CreateTransaction.createRoute(groupId, args), Screen.CreateTransaction)
+    }
+
+    fun navigateToSessions(groupId: String) {
+        navigateBackstackAware(Screen.Sessions.createRoute(groupId), Screen.Sessions)
     }
 
     fun navigateBack() {

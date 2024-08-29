@@ -98,4 +98,8 @@
     <string name="error_transaction_create">There was an error. Check your inputs and try again.</string>
     <string name="share_inactive">Deactivated</string>
     <string name="share_details_delete">Deactivate share</string>
+    <string name="screen_sessions_title">Sessions</string>
+    <string name="last_active">Last active</string>
+    <string name="delete_session">Delete Session</string>
+    <string name="delete_session_desc">Do you want to delete that session?</string>
 </resources>

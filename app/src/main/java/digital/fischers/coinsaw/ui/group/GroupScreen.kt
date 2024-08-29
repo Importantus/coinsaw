@@ -81,6 +81,7 @@ fun GroupScreen(
     onBackNavigation: () -> Unit,
     onGroupSettingsClicked: (String) -> Unit,
     onSharesClicked: (String) -> Unit,
+    onSessionsClicked: (String) -> Unit,
     onMakeOnlineClicked: (String) -> Unit,
     onGroupMembersClicked: (String) -> Unit,
     onAddMemberClicked: (String) -> Unit,
@@ -204,6 +205,25 @@ fun GroupScreen(
                                 },
                                 onClick = {
                                     onSharesClicked(groupId)
+                                    menuExpanded = false
+                                },
+                                colors = MenuDefaults.itemColors(
+                                    textColor = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.icon_device),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onBackground
+                                    )
+                                },
+                                text = {
+                                    Text(text = stringResource(id = R.string.screen_sessions_title))
+                                },
+                                onClick = {
+                                    onSessionsClicked(groupId)
                                     menuExpanded = false
                                 },
                                 colors = MenuDefaults.itemColors(

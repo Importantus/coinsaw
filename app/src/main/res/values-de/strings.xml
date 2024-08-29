@@ -97,4 +97,8 @@
     <string name="error_transaction_create">Ups, da ist irgendwo ein Fehler. Überprüf deine Eingaben und versuche es nochmal!</string>
     <string name="share_inactive">Inaktiv</string>
     <string name="share_details_delete">Freigabe löschen</string>
+    <string name="screen_sessions_title">Sitzungen</string>
+    <string name="last_active">Zuletzt aktiv</string>
+    <string name="delete_session">Session löschen</string>
+    <string name="delete_session_desc">Möchtest du diese Sitzung löschen?</string>
 </resources>
