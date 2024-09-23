@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.hilt.work)
     implementation(libs.work.runtime.ktx)
+    kapt(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 

@@ -30,6 +30,7 @@ material = "1.7.0-beta07"
 hiltWork = "1.2.0"
 workRuntimeKtx = "2.10.0-alpha04"
 workRuntimeKtxVersion = "2.9.1"
+hiltCompilerVersion = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -68,6 +69,7 @@ androidx-material = { group = "androidx.compose.material", name = "material", ve
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "hiltCompilerVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
