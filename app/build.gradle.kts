@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "digital.fischers.coinsaw"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "digital.fischers.coinsaw"
@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.qrcode.kotlin)
     implementation(libs.androidx.material)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.work.runtime.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
