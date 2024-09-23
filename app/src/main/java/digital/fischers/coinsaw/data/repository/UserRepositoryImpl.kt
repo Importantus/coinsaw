@@ -1,17 +1,15 @@
 package digital.fischers.coinsaw.data.repository
 
-import android.util.Log
 import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.data.database.UserDao
+import digital.fischers.coinsaw.domain.changelog.ChangelogProcessor
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.changelog.EntryAction
 import digital.fischers.coinsaw.domain.changelog.EntryType
 import digital.fischers.coinsaw.domain.changelog.Payload
-import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.util.UUID
@@ -19,7 +17,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userDao: UserDao,
-    private val groupRepository: GroupRepository
+    private val changelogProcessor: ChangelogProcessor
 ) : UserRepository {
     override fun getAllUsersByGroupIdStream(groupId: String): Flow<List<User>> {
         return userDao.getByGroupId(groupId)
@@ -61,7 +59,7 @@ class UserRepositoryImpl @Inject constructor(
             )
         )
 
-        groupRepository.processEntry(entry)
+        changelogProcessor.processEntry(entry, false)
 
         if(user.isMe) {
             setUserAsMe(groupId, userId, true)
@@ -80,7 +78,7 @@ class UserRepositoryImpl @Inject constructor(
             payload = changes
         )
 
-        groupRepository.processEntry(entry)
+        changelogProcessor.processEntry(entry, false)
     }
 
 

@@ -2,23 +2,21 @@ package digital.fischers.coinsaw.data.repository
 
 import digital.fischers.coinsaw.data.database.Bill
 import digital.fischers.coinsaw.data.database.BillDao
-import digital.fischers.coinsaw.data.database.Splitting
+import digital.fischers.coinsaw.domain.changelog.ChangelogProcessor
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.changelog.EntryAction
 import digital.fischers.coinsaw.domain.changelog.EntryType
 import digital.fischers.coinsaw.domain.changelog.Payload
 import digital.fischers.coinsaw.domain.repository.BillRepository
-import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import java.util.UUID
 import javax.inject.Inject
 
 class BillRepositoryImpl @Inject constructor(
     private val billDao: BillDao,
-    private val groupRepository: GroupRepository
+    private val changelogProcessor: ChangelogProcessor
 ) : BillRepository {
     override fun getAllBillsStream(): Flow<List<Bill>> {
         return billDao.getAllBills()
@@ -61,7 +59,7 @@ class BillRepositoryImpl @Inject constructor(
             )
         )
 
-        groupRepository.processEntry(entry)
+        changelogProcessor.processEntry(entry, false)
     }
 
     override suspend fun updateBill(groupId: String, changes: Payload.Bill) {
@@ -74,7 +72,7 @@ class BillRepositoryImpl @Inject constructor(
             payload = changes
         )
 
-        groupRepository.processEntry(entry)
+        changelogProcessor.processEntry(entry, false)
     }
 
     override suspend fun deleteBill(billId: String) {
@@ -92,7 +90,7 @@ class BillRepositoryImpl @Inject constructor(
                 )
             )
 
-            groupRepository.processEntry(entry)
+            changelogProcessor.processEntry(entry, false)
         }
     }
 }

@@ -1,17 +1,12 @@
 package digital.fischers.coinsaw.data.repository
 
-import android.util.Log
-import com.google.gson.Gson
-import digital.fischers.coinsaw.data.database.Bill
 import digital.fischers.coinsaw.data.database.BillDao
 import digital.fischers.coinsaw.data.database.CalculatedTransactionDao
-import digital.fischers.coinsaw.data.database.Changelog
 import digital.fischers.coinsaw.data.database.ChangelogDao
 import digital.fischers.coinsaw.data.database.Group
 import digital.fischers.coinsaw.data.database.GroupDao
-import digital.fischers.coinsaw.data.database.Splitting
-import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.data.database.UserDao
+import digital.fischers.coinsaw.domain.changelog.ChangelogProcessor
 import digital.fischers.coinsaw.domain.changelog.Entry
 import digital.fischers.coinsaw.domain.changelog.EntryAction
 import digital.fischers.coinsaw.domain.changelog.EntryType
@@ -20,9 +15,6 @@ import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepositor
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import java.util.InvalidPropertiesFormatException
 import java.util.UUID
 import javax.inject.Inject
 
@@ -32,7 +24,8 @@ class GroupRepositoryImpl @Inject constructor(
     private val billDao: BillDao,
     private val changelogDao: ChangelogDao,
     private val calculatedTransactionDao: CalculatedTransactionDao,
-    private val calculatedTransactionRepository: CalculatedTransactionRepository
+    private val calculatedTransactionRepository: CalculatedTransactionRepository,
+    private val changelogProcessor: ChangelogProcessor
 ) : GroupRepository {
     override fun getAllGroupsStream(): Flow<List<Group>> {
         return groupDao.getGroups()
@@ -50,161 +43,6 @@ class GroupRepositoryImpl @Inject constructor(
         return groupDao.getGroup(groupId)
     }
 
-    override suspend fun processEntry(changeEntry: Entry) {
-        // If changelog with this ID already exists, do nothing
-        if (changelogDao.getEntry(changeEntry.id).firstOrNull() != null) {
-            return
-        }
-
-        val groupId: String = changeEntry.groupId
-
-        // Write to changelog
-        val entryJson = Gson().toJson(changeEntry)
-        changelogDao.insert(
-            Changelog(
-                id = changeEntry.id,
-                timestamp = changeEntry.timestamp,
-                groupId = changeEntry.groupId,
-                synced = changeEntry.syncTimestamp != null,
-                content = entryJson
-            )
-        )
-
-        Log.d("GroupRepositoryImpl", "Processing entry: $entryJson")
-
-        // Write to database
-        when (changeEntry.type) {
-            EntryType.SETTINGS -> {
-                when (changeEntry.action) {
-                    EntryAction.UPDATE -> {
-                        val settings = changeEntry.payload as Payload.GroupSettings
-                        val group = groupDao.getGroup(groupId).first()
-                        groupDao.update(
-                            group.copy(
-                                name = settings.name ?: group.name,
-                                currency = settings.currency ?: group.currency
-                            )
-                        )
-                    }
-
-                    EntryAction.CREATE -> {
-                        val settings = changeEntry.payload as Payload.GroupSettings
-                        val group = groupDao.getGroup(groupId).firstOrNull()
-                        if (group == null) {
-                            groupDao.insert(
-                                Group(
-                                    id = groupId,
-                                    name = settings.name ?: "",
-                                    currency = settings.currency ?: "",
-                                    online = false,
-                                    createdAt = changeEntry.timestamp,
-                                    lastSync = null,
-                                    admin = true,
-                                    accessToken = null,
-                                    apiEndpoint = null,
-                                    sessionId = null
-                                )
-                            )
-                        } else {
-                            groupDao.update(
-                                group.copy(
-                                    name = settings.name ?: group.name,
-                                    currency = settings.currency ?: group.currency
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-
-            EntryType.BILL -> {
-                when (changeEntry.action) {
-                    EntryAction.CREATE -> {
-                        val bill = changeEntry.payload as Payload.Bill
-                        billDao.insertBill(
-                            Bill(
-                                id = bill.id ?: "",
-                                groupId = groupId,
-                                name = bill.name ?: "",
-                                amount = bill.amount ?: 0.0,
-                                userId = bill.payerId ?: "",
-                                isDeleted = bill.isDeleted ?: false,
-                                createdAt = changeEntry.timestamp,
-                                splittings = bill.participants?.map {
-                                    Splitting(
-                                        userId = it.userId,
-                                        billId = bill.id ?: "",
-                                        percent = it.percentage
-                                    )
-                                } ?: emptyList()
-                            ))
-                    }
-
-                    EntryAction.UPDATE -> {
-                        val changes = changeEntry.payload as Payload.Bill
-                        val bill = billDao.getBillById(changes.id ?: "").first()
-
-                        billDao.updateBill(
-                            bill.copy(
-                                name = changes.name ?: bill.name,
-                                amount = changes.amount ?: bill.amount,
-                                userId = changes.payerId ?: bill.userId,
-                                isDeleted = changes.isDeleted ?: bill.isDeleted,
-                                splittings = changes.participants?.map {
-                                    Splitting(
-                                        userId = it.userId,
-                                        billId = bill.id,
-                                        percent = it.percentage
-                                    )
-                                } ?: bill.splittings
-                            )
-                        )
-                    }
-                }
-            }
-
-            EntryType.USER -> {
-                when (changeEntry.action) {
-                    EntryAction.CREATE -> {
-                        val user = changeEntry.payload as Payload.User
-                        userDao.insert(
-                            User(
-                                id = user.id ?: "",
-                                groupId = groupId,
-                                name = user.name ?: "",
-                                isDeleted = user.isDeleted ?: false,
-                                createdAt = changeEntry.timestamp,
-                                isMe = false
-                            )
-                        )
-                    }
-
-                    EntryAction.UPDATE -> {
-                        val changes = changeEntry.payload as Payload.User
-                        val user = userDao.getById(changes.id ?: "").first()
-                        return userDao.update(
-                            user.copy(
-                                name = changes.name ?: user.name,
-                                isDeleted = changes.isDeleted ?: user.isDeleted
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-        // Calculate transactions
-        calculatedTransactionRepository.calculateForGroup(groupId)
-
-        // Sync group if needed
-        // TODO: Think of a better solution for non-blocking sync. Currently, the group gets synced when the user opens the group screen.
-//        val group = groupDao.getGroup(groupId).first()
-//        if (group.online && group.lastSync != null && changeEntry.syncTimestamp == null) {
-//            syncGroup(groupId)
-//        }
-
-    }
-
     override suspend fun updateGroup(groupId: String, changes: Payload.GroupSettings) {
         val entry = Entry(
             id = UUID.randomUUID().toString(),
@@ -215,7 +53,7 @@ class GroupRepositoryImpl @Inject constructor(
             payload = changes
         )
 
-        processEntry(entry)
+        changelogProcessor.processEntry(entry, false)
     }
 
     override suspend fun createGroup(group: CreateUiStates.Group): Group {
@@ -232,7 +70,7 @@ class GroupRepositoryImpl @Inject constructor(
             sessionId = null
         )
 
-        this.processEntry(
+        changelogProcessor.processEntry(
             Entry(
                 id = UUID.randomUUID().toString(),
                 groupId = newGroup.id,
@@ -243,7 +81,7 @@ class GroupRepositoryImpl @Inject constructor(
                     name = newGroup.name,
                     currency = newGroup.currency
                 )
-            )
+            ), false
         )
 
         return newGroup

@@ -4,12 +4,14 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import digital.fischers.coinsaw.data.model.ChangelogProcessorImpl
 import digital.fischers.coinsaw.data.repository.BillRepositoryImpl
 import digital.fischers.coinsaw.data.repository.CalculatedTransactionRepositoryImpl
 import digital.fischers.coinsaw.data.repository.ChangelogRepositoryImpl
 import digital.fischers.coinsaw.data.repository.GroupRepositoryImpl
 import digital.fischers.coinsaw.data.repository.RemoteRepositoryImpl
 import digital.fischers.coinsaw.data.repository.UserRepositoryImpl
+import digital.fischers.coinsaw.domain.changelog.ChangelogProcessor
 import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
 import digital.fischers.coinsaw.domain.repository.ChangelogRepository
@@ -21,6 +23,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+    @Binds
+    @Singleton
+    abstract fun bindChangelogProcessor(impl: ChangelogProcessorImpl): ChangelogProcessor
+
     @Binds
     @Singleton
     abstract fun bindGroupRepository(impl: GroupRepositoryImpl): GroupRepository
