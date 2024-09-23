@@ -8,8 +8,8 @@ import digital.fischers.coinsaw.data.database.Group
 import digital.fischers.coinsaw.data.database.GroupDao
 import digital.fischers.coinsaw.data.remote.APIError
 import digital.fischers.coinsaw.data.remote.APIResult
-import digital.fischers.coinsaw.data.remote.ApiPath
 import digital.fischers.coinsaw.data.remote.Api
+import digital.fischers.coinsaw.data.remote.ApiPath
 import digital.fischers.coinsaw.data.remote.CreateGroupRequest
 import digital.fischers.coinsaw.data.remote.CreateGroupResponse
 import digital.fischers.coinsaw.data.remote.CreateSessionRequest
@@ -19,22 +19,22 @@ import digital.fischers.coinsaw.data.remote.CreateShareResponse
 import digital.fischers.coinsaw.data.remote.Session
 import digital.fischers.coinsaw.data.remote.Share
 import digital.fischers.coinsaw.data.remote.ShareWithToken
+import digital.fischers.coinsaw.data.remote.SyncChangelogRequest
 import digital.fischers.coinsaw.data.remote.apiCall
 import digital.fischers.coinsaw.data.util.ChangelogJSONAdapter
 import digital.fischers.coinsaw.data.util.decodeToken
+import digital.fischers.coinsaw.domain.changelog.ChangelogProcessor
 import digital.fischers.coinsaw.domain.changelog.Entry
-import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import kotlinx.coroutines.flow.firstOrNull
 import org.json.JSONObject
-import retrofit2.Response
 import javax.inject.Inject
 
 class RemoteRepositoryImpl @Inject constructor(
     private val api: Api,
     private val groupDao: GroupDao,
     private val changelogDao: ChangelogDao,
-    private val groupRepository: GroupRepository
+    private val changelogProcessor: ChangelogProcessor
 ) : RemoteRepository {
     private suspend fun getAccessTokenAndServerUrl(groupId: String): Pair<String, String> {
         val group = groupDao.getGroup(groupId).firstOrNull()
@@ -92,56 +92,45 @@ class RemoteRepositoryImpl @Inject constructor(
         val lastSyncTimestamp = group.lastSync ?: 0
 
         val localChanges =
-            (changelogDao.getEntriesByGroupYoungerThanTimestamp(groupId, lastSyncTimestamp)
+            (changelogDao.getEntriesByGroupYoungerThanTimestampNotSynced(groupId, lastSyncTimestamp)
                 .firstOrNull()
                 ?: emptyList()).fastMap {
                 GsonBuilder().registerTypeAdapter(Entry::class.java, ChangelogJSONAdapter())
                     .create().fromJson(it.content, Entry::class.java)
             }
 
-        val postResponse = apiCall {
-            api.postChangelog(
-                appendToServerUrl(serverUrl, ApiPath.POST_ENTRIES),
+        val syncResponse = apiCall {
+            api.syncChangelog(
+                appendToServerUrl(serverUrl, ApiPath.SYNC_ENTRIES),
                 accessToken,
-                localChanges
+                SyncChangelogRequest(
+                    lastSync = lastSyncTimestamp,
+                    data = localChanges
+                )
             )
         }
 
-        when (postResponse) {
+        when (syncResponse) {
             is APIResult.Success -> {
-                val getResponse = apiCall {
-                    api.getChangelog(
-                        appendToServerUrl(serverUrl, ApiPath.GET_ENTRIES),
-                        accessToken,
-                        lastSyncTimestamp
-                    )
+                val remoteChanges = syncResponse.data
+
+                remoteChanges.sortedBy {
+                    it.timestamp
+                }.forEach {
+                    changelogProcessor.processEntry(it, true)
                 }
 
-                when (getResponse) {
-                    is APIResult.Success -> {
-                        val remoteChanges = getResponse.data
+                val groupWithLastChanges = groupDao.getGroup(groupId).firstOrNull()
+                    ?: throw IllegalStateException("Group not found")
+                groupDao.update(groupWithLastChanges.copy(lastSync = System.currentTimeMillis()))
 
-                        remoteChanges.reversed().forEach {
-                            groupRepository.processEntry(it)
-                        }
-
-                        val groupWithLastChanges = groupDao.getGroup(groupId).firstOrNull()
-                            ?: throw IllegalStateException("Group not found")
-                        groupDao.update(groupWithLastChanges.copy(lastSync = System.currentTimeMillis()))
-                    }
-
-                    is APIResult.Error -> {
-                        return getResponse
-                    }
-                }
+                return APIResult.Success(Unit)
             }
 
             is APIResult.Error -> {
-                return postResponse
+                return syncResponse
             }
         }
-
-        return postResponse
     }
 
     override suspend fun createShare(

@@ -11,5 +11,6 @@ enum class ApiPath(val path: String) {
     GET_SHARE("/v1/share"),
     DELETE_SHARE("/v1/share"),
     GET_ENTRIES("/v1/data"),
-    POST_ENTRIES("/v1/data")
+    POST_ENTRIES("/v1/data"),
+    SYNC_ENTRIES("/v1/data/sync")
 }

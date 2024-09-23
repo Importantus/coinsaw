@@ -13,8 +13,6 @@ interface GroupRepository {
     fun getOfflineGroupsStream(): Flow<List<Group>>
     fun getGroupStream(groupId: String): Flow<Group?>
 
-    suspend fun processEntry(changeEntry: Entry)
-
     suspend fun updateGroup(groupId: String, changes: Payload.GroupSettings)
     suspend fun createGroup(group: CreateUiStates.Group): Group
 

@@ -16,11 +16,14 @@ interface ChangelogDao {
     @Query("SELECT * FROM changelog WHERE groupId = :groupId")
     fun getEntriesByGroup(groupId: String): Flow<List<Changelog>>
 
-    @Query("SELECT * FROM changelog WHERE groupId = :groupId AND timestamp < :timestamp")
+    @Query("SELECT * FROM changelog WHERE groupId = :groupId AND timestamp > :timestamp")
     fun getEntriesByGroupYoungerThanTimestamp(groupId: String, timestamp: Long): Flow<List<Changelog>>
 
-    @Query("SELECT * FROM changelog WHERE groupId = :groupId AND timestamp > :timestamp")
+    @Query("SELECT * FROM changelog WHERE groupId = :groupId AND timestamp < :timestamp")
     fun getEntriesByGroupOlderThanTimestamp(groupId: String, timestamp: Long): Flow<List<Changelog>>
+
+    @Query("SELECT * FROM changelog WHERE groupId = :groupId AND timestamp > :timestamp AND synced = 0")
+    fun getEntriesByGroupYoungerThanTimestampNotSynced(groupId: String, timestamp: Long): Flow<List<Changelog>>
 
     @Insert
     suspend fun insert(entry: Changelog)

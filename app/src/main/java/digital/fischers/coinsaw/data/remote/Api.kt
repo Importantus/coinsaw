@@ -70,4 +70,11 @@ interface Api {
         @Query("from") from: Long,
         @Query("to") to: Long? = null
     ): Response<List<Entry>>
+
+    @POST
+    suspend fun syncChangelog(
+        @Url url: String,
+        @Header("Authorization") privateSessionToken: String,
+        @Body body: SyncChangelogRequest
+    ): Response<List<Entry>>
 }
