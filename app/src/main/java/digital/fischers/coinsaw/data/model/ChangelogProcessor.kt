@@ -2,6 +2,7 @@ package digital.fischers.coinsaw.data.model
 
 import android.util.Log
 import com.google.gson.Gson
+import dagger.Lazy
 import digital.fischers.coinsaw.data.database.Bill
 import digital.fischers.coinsaw.data.database.BillDao
 import digital.fischers.coinsaw.data.database.Changelog
@@ -17,8 +18,12 @@ import digital.fischers.coinsaw.domain.changelog.EntryAction
 import digital.fischers.coinsaw.domain.changelog.EntryType
 import digital.fischers.coinsaw.domain.changelog.Payload
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
+import digital.fischers.coinsaw.domain.repository.RemoteRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChangelogProcessorImpl @Inject constructor(
@@ -26,7 +31,8 @@ class ChangelogProcessorImpl @Inject constructor(
     private val userDao: UserDao,
     private val billDao: BillDao,
     private val changelogDao: ChangelogDao,
-    private val calculatedTransactionRepository: CalculatedTransactionRepository
+    private val calculatedTransactionRepository: CalculatedTransactionRepository,
+    private val remoteRepository: Lazy<RemoteRepository>
 ) : ChangelogProcessor {
     override suspend fun processEntry(entry: Entry, fromRemote: Boolean) {
         // If changelog with this ID already exists, do nothing
@@ -174,12 +180,11 @@ class ChangelogProcessorImpl @Inject constructor(
         // Calculate transactions
         calculatedTransactionRepository.calculateForGroup(groupId)
 
-        // Sync group if needed
-        // TODO: Think of a better solution for non-blocking sync. Currently, the group gets synced when the user opens the group screen.
-//        val group = groupDao.getGroup(groupId).first()
-//        if (group.online && group.lastSync != null && changeEntry.syncTimestamp == null) {
-//            syncGroup(groupId)
-//        }
+        if(!fromRemote) {
+            CoroutineScope(Dispatchers.IO).launch {
+                remoteRepository.get().syncGroup(groupId)
+            }
+        }
 
     }
 }
