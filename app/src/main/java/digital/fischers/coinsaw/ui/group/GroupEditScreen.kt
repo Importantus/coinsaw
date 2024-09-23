@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.ui.group
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
+import digital.fischers.coinsaw.intents.disableAddBillShortcut
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
@@ -94,6 +97,7 @@ fun GroupEditScreen(
             )
         }
         if (showDeleteModal) {
+            val context = LocalContext.current
             DeleteModal(
                 title = stringResource(id = R.string.delete_group),
                 description = stringResource(id = R.string.delete_group_confirmation),
@@ -101,6 +105,7 @@ fun GroupEditScreen(
                     coroutineScope.launch {
                         viewModel.deleteGroup()
                     }.invokeOnCompletion {
+                        disableAddBillShortcut(context = context, groupId = groupId)
                         viewModel.hideDeleteModal()
                         onAfterDeleteNavigation()
                     }

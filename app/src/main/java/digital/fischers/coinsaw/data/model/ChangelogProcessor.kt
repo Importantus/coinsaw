@@ -180,7 +180,9 @@ class ChangelogProcessorImpl @Inject constructor(
         // Calculate transactions
         calculatedTransactionRepository.calculateForGroup(groupId)
 
-        if(!fromRemote) {
+        val group = groupDao.getGroup(groupId).firstOrNull()
+
+        if(!fromRemote && group?.online == true) {
             CoroutineScope(Dispatchers.IO).launch {
                 remoteRepository.get().syncGroup(groupId)
             }

@@ -1,5 +1,7 @@
 package digital.fischers.coinsaw.ui
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -38,6 +40,7 @@ import digital.fischers.coinsaw.ui.remote.ShowRecoveryTokenScreen
 
 @Composable
 fun CoinsawApp(
+    intent: Intent?,
     appState: CoinsawAppState = rememberCoinsawAppState()
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -48,7 +51,7 @@ fun CoinsawApp(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             navController = appState.navController,
-            startDestination = Screen.Home.route,
+            startDestination =  Screen.Home.route,
             enterTransition = {
                 val initialDeep = getRouteDeepness(initialState.destination.route ?: "")
                 val targetDeep = getRouteDeepness(targetState.destination.route ?: "")
@@ -276,12 +279,12 @@ fun CoinsawApp(
                     appState.navigateBack()
                 }, onAfterDeleteNavigation = { appState.navigateHome() })
             }
-            
-            composable(Screen.BillDetails.route) { 
+
+            composable(Screen.BillDetails.route) {
                 BillDetailsScreen(onBackNavigation = {
                     appState.navigateBack()
-                }, onEditNavigation = { groupId, billId ->  
-                    
+                }, onEditNavigation = { groupId, billId ->
+
                 })
             }
 
@@ -297,6 +300,11 @@ fun CoinsawApp(
                 })
             }
         }
+    }
+
+    val intentGroupId = intent?.getStringExtra("groupId")
+    if(intentGroupId != null) {
+        appState.navigateToAddBill(intentGroupId)
     }
 }
 

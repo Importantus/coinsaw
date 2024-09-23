@@ -1,11 +1,12 @@
 package digital.fischers.coinsaw.ui.viewModels
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.data.database.Group
@@ -15,6 +16,7 @@ import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepositor
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
+import digital.fischers.coinsaw.intents.pushAddBillShortcut
 import digital.fischers.coinsaw.ui.group.GroupScreenUiStates
 import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
@@ -33,8 +35,11 @@ class GroupViewModel @Inject constructor(
     private val calculatedTransactionRepository: CalculatedTransactionRepository,
     private val billRepository: BillRepository,
     private val remoteRepository: RemoteRepository,
+    application: Application,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : AndroidViewModel(application) {
+    private val context = getApplication<Application>().applicationContext
+
     val groupId: String = savedStateHandle.get<String>(Screen.ARG_GROUP_ID)!!
 
     var syncError by mutableStateOf(false)
@@ -117,7 +122,7 @@ class GroupViewModel @Inject constructor(
                 val group = groupRepository.getGroupStream(groupId).map {
                     group -> groupUIStateFromGroup(group)
                 }.first()
-                syncGroup(group)
+                pushAddBillShortcut(context, groupId, group.name)
             }
     }
 
