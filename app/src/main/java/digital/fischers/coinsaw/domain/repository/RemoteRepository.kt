@@ -18,6 +18,8 @@ interface RemoteRepository {
 
     suspend fun syncGroup(groupId: String): APIResult<Unit>
 
+    suspend fun syncAllGroups()
+
     suspend fun createShare(groupId: String, options: CreateShareRequest): APIResult<CreateShareResponse>
 
     suspend fun getAllShares(groupId: String): APIResult<List<Share>>

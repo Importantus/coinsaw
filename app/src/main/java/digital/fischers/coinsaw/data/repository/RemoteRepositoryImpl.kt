@@ -133,6 +133,18 @@ class RemoteRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncAllGroups(){
+        val onlineGroups = groupDao.getOnlineGroups().firstOrNull()
+
+        onlineGroups?.forEach { group ->
+            try {
+                syncGroup(group.id)
+            } catch (e: Exception) {
+                Log.d("API_CALL", "Exception: $e")
+            }
+        }
+    }
+
     override suspend fun createShare(
         groupId: String,
         options: CreateShareRequest
