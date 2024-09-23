@@ -101,4 +101,6 @@
     <string name="last_active">Zuletzt aktiv</string>
     <string name="delete_session">Session löschen</string>
     <string name="delete_session_desc">Möchtest du diese Sitzung löschen?</string>
+    <string name="add_bill_shortcut_disabled">Diese Gruppe existiert nicht mehr</string>
+    <string name="add_bill_shortcut_desc">Ausgabe eintragen in</string>
 </resources>
