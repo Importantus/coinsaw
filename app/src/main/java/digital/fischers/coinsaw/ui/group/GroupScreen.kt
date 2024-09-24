@@ -749,6 +749,7 @@ fun TransactionElement(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.clickable { onClick() }.padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.icon_money),

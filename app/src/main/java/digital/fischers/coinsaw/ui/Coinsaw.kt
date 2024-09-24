@@ -184,7 +184,7 @@ fun CoinsawApp(
                     },
                     onSettleUpClicked = {},
                     onTransactionClicked = { groupId, transactionId ->
-
+                        appState.navigateToBillDetails(groupId, transactionId)
                     },
                     onNoSessionNavigation = {
                         appState.navigateToEnterShareToken("", true)
