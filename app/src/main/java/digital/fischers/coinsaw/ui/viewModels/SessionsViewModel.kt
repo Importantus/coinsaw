@@ -53,7 +53,7 @@ class SessionsViewModel @Inject constructor(
     fun load() {
         viewModelScope.launch {
             loading = true
-            _sessions.value = when (val sessionsResponse = remoteRepository.getAllSessions(groupId)) {
+            var sessions = when (val sessionsResponse = remoteRepository.getAllSessions(groupId)) {
                 is APIResult.Success -> {
                     loadError = null
                     sessionsResponse.data
@@ -63,6 +63,10 @@ class SessionsViewModel @Inject constructor(
                     emptyList<Session>()
                 }
             }
+
+            sessions = sessions.sortedByDescending { it.last_active_timestamp }
+
+            _sessions.value = sessions
             loading = false
         }
     }
