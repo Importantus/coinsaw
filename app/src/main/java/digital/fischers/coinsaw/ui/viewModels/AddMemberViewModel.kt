@@ -37,6 +37,7 @@ class AddMemberViewModel @Inject constructor(
     suspend fun createUser() {
         loading = true
         userRepository.createUser(groupId, _newUserState.value)
+        _newUserState.value = CreateUiStates.User()
         loading = false
     }
 }
