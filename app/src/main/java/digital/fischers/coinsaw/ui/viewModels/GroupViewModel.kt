@@ -20,6 +20,7 @@ import digital.fischers.coinsaw.intents.pushAddBillShortcut
 import digital.fischers.coinsaw.ui.group.GroupScreenUiStates
 import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -84,16 +85,24 @@ class GroupViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    val bills = billRepository.getBillsByGroupAndIsDeletedStream(groupId, isDeleted = false).map { bills ->
-        val me = userRepository.getUserByGroupIdAndIsMeStream(groupId, true).firstOrNull()
+    private val me = userRepository.getUserByGroupIdAndIsMeStream(groupId, true).stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000L),
+        initialValue = null
+    )
+
+    // Combine the me StateFlow with the bills StateFlow
+    val bills = combine(
+        me,
+        billRepository.getBillsByGroupAndIsDeletedStream(groupId, isDeleted = false)
+    ) { me, bills ->
         bills.map {
             var myShare = it.splittings.find { split -> split.userId == me?.id }?.percent
-            if(me != null && it.userId == me.id) {
+            if (me != null && it.userId == me.id) {
                 myShare = 1.0 - (myShare ?: 0.0)
             }
-            val myShareMultiplier = if(me != null && it.userId == me.id) 1 else -1
-            Log.d("GroupViewModel", "myShare: $myShare, myShareMultiplier: $myShareMultiplier, amount: ${it.amount}")
-            val temp  = GroupScreenUiStates.Bill(
+            val myShareMultiplier = if (me != null && it.userId == me.id) 1 else -1
+            GroupScreenUiStates.Bill(
                 id = it.id,
                 name = it.name,
                 amount = it.amount,
@@ -101,15 +110,13 @@ class GroupViewModel @Inject constructor(
                 myShare = it.amount * (myShare ?: 0.0) * myShareMultiplier,
                 payer = getUserStateFlow(it.userId),
                 // Only get splittings if title is empty (meaning it's a transaction)
-                splitting = if(it.name.isBlank()) it.splittings.map { splitting ->
+                splitting = if (it.name.isBlank()) it.splittings.map { splitting ->
                     GroupScreenUiStates.Splitting(
                         user = getUserStateFlow(splitting.userId),
                         percentage = splitting.percent
                     )
                 } else emptyList()
             )
-            Log.d("GroupViewModel", "temp: $temp")
-            temp
         }
     }.stateIn(
         scope = viewModelScope,
@@ -143,7 +150,8 @@ class GroupViewModel @Inject constructor(
             currency = group?.currency ?: "",
             isOnline = group?.online ?: false,
             isAdmin = group?.admin ?: false,
-            hasSession = group?.sessionId != null
+            hasSession = group?.sessionId != null,
+            lastSync = group?.lastSync ?: 0
         )
     }
 
