@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.ui.components
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,37 +23,40 @@ fun CustomNavigationBar(
     backNavigation: () -> Unit,
     menu: @Composable (() -> Unit)? = null
 ) {
-        Box(
+    BackHandler { backNavigation() }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
+            CustomButton(
+                icon = R.drawable.icon_arrow_left,
+                text = backNavigationText,
+                onClick = { backNavigation() })
+
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                    .wrapContentSize(Alignment.TopEnd)
             ) {
-                CustomButton(
-                    icon = R.drawable.icon_arrow_left,
-                    text = backNavigationText,
-                    onClick = { backNavigation() })
-
-                Box(modifier = Modifier
-                    .wrapContentSize(Alignment.TopEnd)) {
-                    menu?.invoke()
-                }
+                menu?.invoke()
             }
-            Text(
-                text = title,
-                modifier = Modifier.align(Alignment.Center),
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            )
-
         }
+        Text(
+            text = title,
+            modifier = Modifier.align(Alignment.Center),
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+
+    }
 
 
 }
