@@ -1,9 +1,11 @@
 package digital.fischers.coinsaw.ui.viewModels
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,6 +16,7 @@ import digital.fischers.coinsaw.data.remote.CreateSessionRequest
 import digital.fischers.coinsaw.data.util.decodeToken
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.ui.Screen
+import digital.fischers.coinsaw.ui.utils.getDeviceName
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import javax.inject.Inject
@@ -40,13 +43,13 @@ class InitialSyncViewModel @Inject constructor(
         null
     }
 
-    init {
+    fun sync(context: Context) {
         viewModelScope.launch {
             if(groupId != null) {
                 val sessionResponse = remoteRepository.createSession(
                     CreateSessionRequest(
                         shareToken,
-                        android.os.Build.MODEL
+                        getDeviceName(context.contentResolver)
                     )
                 )
 
