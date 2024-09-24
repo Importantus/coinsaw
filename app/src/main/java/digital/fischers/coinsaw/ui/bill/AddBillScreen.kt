@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -249,9 +250,7 @@ fun SplittingSection(
     onSplittingChanged: (String, String) -> Unit,
     percentRemaining: Double
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+    Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -260,8 +259,19 @@ fun SplittingSection(
             Text(text = "%.1f".format(percentRemaining) + "%")
         }
 
-        splittings.forEach {
-            SplittingElement(users = users, splitting = it, onSplittingChanged = onSplittingChanged)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(splittings.size) { index ->
+                val it = splittings[index]
+                SplittingElement(
+                    users = users,
+                    splitting = it,
+                    onSplittingChanged = onSplittingChanged
+                )
+            }
         }
     }
 }
