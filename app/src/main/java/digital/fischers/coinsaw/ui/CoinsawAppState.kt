@@ -125,7 +125,8 @@ class CoinsawAppState(
     }
 
     fun navigateHome() {
-        navigateBackstackAware(Screen.Home.route, Screen.Home)
+        // Clear all backstack entries and navigate to home
+        navController.popBackStack(navController.graph.startDestinationId, false)
     }
 
     fun navigateToGroup(groupId: String) {
