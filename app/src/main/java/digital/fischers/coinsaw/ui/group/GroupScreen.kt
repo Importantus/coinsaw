@@ -39,24 +39,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 import digital.fischers.coinsaw.ui.components.BaseScreen
+import digital.fischers.coinsaw.ui.components.BoxWithArrowRight
 import digital.fischers.coinsaw.ui.components.ContentWrapperWithFallback
 import digital.fischers.coinsaw.ui.components.CustomButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
+import digital.fischers.coinsaw.ui.theme.neutral
 import digital.fischers.coinsaw.ui.theme.successText
+import digital.fischers.coinsaw.ui.utils.getDate
+import digital.fischers.coinsaw.ui.utils.getTimeDifference
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
 import java.util.Date
 import java.util.Locale
@@ -242,8 +250,64 @@ fun GroupScreen(
                 }, type = CustomFloatingActionButtonType.ADD)
             }
         },
-        title = group.name
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = group.name,
+                style = TextStyle(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.neutral
+                )
+            )
+            if (group.isOnline) {
+                var popUpOpen by remember { mutableStateOf(false) }
+
+                if (popUpOpen) {
+                    Popup(
+                        alignment = Alignment.CenterEnd,
+                        offset = IntOffset(-100, 0),
+                        onDismissRequest = { popUpOpen = false },
+                    ) {
+                        BoxWithArrowRight(color = MaterialTheme.colorScheme.surface) {
+                            Text(
+                                text = stringResource(R.string.last_sync) + " " + getTimeDifference(
+                                    group.lastSync,
+                                    LocalContext.current
+                                ),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            )
+                        }
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .clickable { popUpOpen = !popUpOpen }
+                        .padding(6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.icon_cloud),
+                        contentDescription = null,
+                        Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.neutral
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
         if (group.isOnline && !group.hasSession) {
             Row(
                 modifier = Modifier
