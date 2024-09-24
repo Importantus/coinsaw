@@ -196,6 +196,13 @@ class RemoteRepositoryImpl @Inject constructor(
             val decodedToken = JSONObject(decodeToken(options.token))
             val serverUrl = decodedToken.getString("server")
             val groupId = decodedToken.getString("groupId")
+
+            val group = groupDao.getGroup(groupId).firstOrNull()
+
+            if(group != null && group.online && group.apiEndpoint == serverUrl) {
+                return APIResult.Error(APIError.UnknownError)
+            }
+
             val response = apiCall {
                 api.createSession(
                     appendToServerUrl(serverUrl, ApiPath.CREATE_SESSION),
@@ -205,8 +212,6 @@ class RemoteRepositoryImpl @Inject constructor(
 
             when (response) {
                 is APIResult.Success -> {
-                    val group = groupDao.getGroup(groupId).firstOrNull()
-
                     val session = response.data
 
                     if (group == null) {
@@ -227,6 +232,7 @@ class RemoteRepositoryImpl @Inject constructor(
                     } else {
                         groupDao.update(
                             group.copy(
+                                apiEndpoint = serverUrl,
                                 sessionId = session.id,
                                 accessToken = session.token,
                                 admin = session.admin,
