@@ -1,10 +1,14 @@
 package digital.fischers.coinsaw.ui.components
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import digital.fischers.coinsaw.R
 
 enum class CustomFloatingActionButtonType {
@@ -22,7 +26,8 @@ fun CustomFloatingActionButton(
     FloatingActionButton(
         onClick = onClick,
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.imePadding()
     ) {
         when (type) {
             CustomFloatingActionButtonType.CONFIRM -> {
