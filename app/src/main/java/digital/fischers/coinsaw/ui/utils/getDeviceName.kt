@@ -13,5 +13,11 @@ fun getDeviceName(contentResolver: ContentResolver): String {
     )
 
     // Return the first non-null value
-    return functions.firstNotNullOfOrNull { it() } ?: "Unknown Device"
+    return functions.firstNotNullOfOrNull {
+        try {
+            it()
+        } catch (e: Exception) {
+            null
+        }
+    } ?: "Unknown Device"
 }
