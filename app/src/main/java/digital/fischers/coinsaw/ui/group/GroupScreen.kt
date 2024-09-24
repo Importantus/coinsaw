@@ -1,6 +1,8 @@
 package digital.fischers.coinsaw.ui.group
 
 import android.text.format.DateFormat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,13 +25,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -374,117 +375,166 @@ fun GroupScreen(
                     }
                 }
             }) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    item {
-                        ContentWrapperWithFallback(calculatedTransactions,
-                            showCondition = calculatedTransactions.isNotEmpty(),
-                            loading = {
-                                Text(text = stringResource(id = R.string.loading))
-                            },
-                            fallback = {
-                                Text(
-                                    text = "🎉 " + stringResource(id = R.string.settled_up)
+                Column {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.heightIn(max = (.3f * LocalConfiguration.current.screenHeightDp).dp)
+                    ) {
+                        if (calculatedTransactions.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier
+                                                .height(56.dp)
+                                                .width(56.dp)
+                                                .clip(MaterialTheme.shapes.small)
+                                                .background(MaterialTheme.colorScheme.surface)
+                                                .padding(8.dp),
+                                        ) {
+                                            Text(
+                                                "🎉", style = TextStyle(
+                                                    fontSize = 28.sp,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = MaterialTheme.colorScheme.onBackground
+                                                )
+                                            )
+                                        }
+                                        Column {
+                                            Text(
+                                                stringResource(R.string.all_settled_up_title),
+                                                style = TextStyle(
+                                                    fontSize = 18.sp,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = MaterialTheme.colorScheme.onBackground
+                                                )
+                                            )
+                                            Text(
+                                                stringResource(R.string.settled_up),
+                                                style = TextStyle(
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Light,
+                                                    color = MaterialTheme.colorScheme.onBackground.copy(
+                                                        alpha = 0.6f
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            items(calculatedTransactions.size) { index ->
+                                val transaction = calculatedTransactions[index]
+
+                                val payer by transaction.payer.collectAsState()
+                                val payee by transaction.payee.collectAsState()
+                                CalculatedTransactionElement(
+                                    currency = group.currency,
+                                    amount = transaction.amount,
+                                    payer = payer.name,
+                                    payee = payee.name,
+                                    payerIsMe = payer.isMe,
+                                    onClick = {
+                                        onAddTransactionClicked(
+                                            groupId,
+                                            AddTransactionArguments(
+                                                payeeId = payee.id,
+                                                payerId = payer.id,
+                                                amount = transaction.amount.toString()
+                                            )
+                                        )
+                                    }
                                 )
-                            }) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                if (payer.isMe) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Divider(
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+                        modifier = Modifier.fillMaxWidth(),
+                        thickness = 1.dp
+                    )
+
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
+                        items(count = bills.size) { index ->
+                            val bill = bills[index]
+
+                            // If the month of the current bill is different, than the previous bill, show the month
+                            if (index > 0 && DateFormat.format(
+                                    "MM",
+                                    Date(bill.created)
+                                ) != DateFormat.format("MM", Date(bills[index - 1].created))
                             ) {
-                                calculatedTransactions.forEach { transaction ->
-                                    val payer by transaction.payer.collectAsState()
-                                    if (payer.isMe) {
-                                        val payee by transaction.payee.collectAsState()
-                                        CalculatedTransactionElement(
+                                Text(
+                                    modifier = Modifier.padding(vertical = 20.dp),
+                                    text = DateFormat.format("MMMM yyyy", Date(bill.created))
+                                        .toString(),
+                                    style = TextStyle(
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                )
+                            }
+
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = slideInVertically()
+                            ) {
+                                BaseTimeLineElement(
+                                    bill.created
+                                ) {
+                                    val payer by bill.payer!!.collectAsState()
+
+                                    if (bill.name.isBlank() && bill.splitting.size == 1) {
+                                        val payee by bill.splitting.first().user.collectAsState()
+                                        TransactionElement(
                                             currency = group.currency,
-                                            amount = transaction.amount,
-                                            payer = payer.name,
-                                            payee = payee.name,
-                                            payerIsMe = true,
-                                            onClick = {
-                                                onAddTransactionClicked(
-                                                    groupId,
-                                                    AddTransactionArguments(
-                                                        payeeId = payee.id,
-                                                        payerId = payer.id,
-                                                        amount = transaction.amount.toString()
-                                                    )
-                                                )
-                                            }
+                                            payer = payer,
+                                            amount = bill.amount,
+                                            payee = payee,
+                                            onClick = { onTransactionClicked(groupId, bill.id) }
                                         )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    }
-                                }
-                                calculatedTransactions.forEach { transaction ->
-                                    val payer by transaction.payer.collectAsState()
-                                    if (!payer.isMe) {
-                                        val payee by transaction.payee.collectAsState()
-                                        CalculatedTransactionElement(
+                                    } else {
+                                        BillElement(
+                                            meSet = meSet,
                                             currency = group.currency,
-                                            amount = transaction.amount,
-                                            payer = payer.name,
-                                            payee = payee.name,
-                                            payerIsMe = false,
-                                            onClick = {
-                                                onAddTransactionClicked(
-                                                    groupId,
-                                                    AddTransactionArguments(
-                                                        payeeId = payee.id,
-                                                        payerId = payer.id,
-                                                        amount = transaction.amount.toString()
-                                                    )
-                                                )
-                                            }
+                                            name = bill.name,
+                                            amount = bill.amount,
+                                            payer = payer,
+                                            myShare = bill.myShare,
+                                            onClick = { onBillClicked(groupId, bill.id) }
                                         )
                                     }
                                 }
                             }
                         }
-                    }
 
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Divider(
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
-                            modifier = Modifier.fillMaxWidth(),
-                            thickness = 1.dp
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-                    items(count = bills.size) { index ->
-                        val bill = bills[index]
-                        BaseTimeLineElement(
-                            bill.created
-                        ) {
-                            val payer by bill.payer!!.collectAsState()
-
-                            if (bill.name.isBlank() && bill.splitting.size == 1) {
-                                val payee by bill.splitting.first().user.collectAsState()
-                                TransactionElement(
-                                    currency = group.currency,
-                                    payer = payer,
-                                    amount = bill.amount,
-                                    payee = payee,
-                                    onClick = { onTransactionClicked(groupId, bill.id) }
-                                )
-                            } else {
-                                BillElement(
-                                    meSet = meSet,
-                                    currency = group.currency,
-                                    name = bill.name,
-                                    amount = bill.amount,
-                                    payer = payer,
-                                    myShare = bill.myShare,
-                                    onClick = { onBillClicked(groupId, bill.id) }
-                                )
-                            }
+                        item {
+                            Spacer(modifier = Modifier.height(42.dp))
                         }
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(42.dp))
                     }
                 }
             }
@@ -653,6 +703,7 @@ fun BaseTimeLineElement(
         Column(
             modifier = Modifier
                 .width(24.dp)
+                .alpha(0.6f)
                 .padding(vertical = verticalPadding.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -675,7 +726,7 @@ fun BaseTimeLineElement(
                 text = DateFormat.format("dd", date).toString(),
                 style = TextStyle(
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             )
@@ -755,14 +806,14 @@ fun BillElement(
             Text(
                 text = name, style = TextStyle(
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                 )
             )
             Text(
                 text = byline,
                 style = TextStyle(
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
             )
         }
@@ -777,7 +828,7 @@ fun BillElement(
                             id = R.string.you_borrowed
                         ), style = TextStyle(
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F)
                         )
                     )
                 }
@@ -813,14 +864,22 @@ fun TransactionElement(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.clickable { onClick() }.padding(horizontal = 8.dp, vertical = 12.dp)
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.icon_money),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onBackground
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
         )
-        Text(text = "${payer.name} ${stringResource(id = R.string.transaction_sent)} ${payee.name} $money")
+        Text(
+            text = "${payer.name} ${stringResource(id = R.string.transaction_sent)} ${payee.name} $money",
+            style = TextStyle(
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+            )
+        )
     }
 
 }
