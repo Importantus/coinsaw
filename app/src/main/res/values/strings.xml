@@ -88,7 +88,7 @@
     <string name="group_restart_initial_sync_desc">Something went wrong when you enabled synchronisation for this group. Try again.</string>
     <string name="add_first_bill">Add your first expense</string>
     <string name="loading">Loading...</string>
-    <string name="settled_up">All settled up!</string>
+    <string name="settled_up">You\'re all settled up!</string>
     <string name="screen_bill_details_title">Expense</string>
     <string name="delete_expense">Delete expense</string>
     <string name="delete_expense_desc">Do you really want to delete this expense?</string>
@@ -105,4 +105,11 @@
     <string name="add_bill_shortcut_disabled">This group doesn\'t exist anymore</string>
     <string name="add_bill_shortcut_desc">Add a bill to</string>
     <string name="transaction">Transaction</string>
+    <string name="all_settled_up_title">You did it!</string>
+    <string name="minutes_ago">%1$d minutes ago</string>
+    <string name="time_format">at %1$s</string>
+    <string name="date_format">on %1$s</string>
+    <string name="last_sync">Last sync:</string>
+    <string name="yesterday_time_format">yesterday at %1$s</string>
+    <string name="just_now">just now</string>
 </resources>

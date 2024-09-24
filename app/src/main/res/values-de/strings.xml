@@ -87,7 +87,7 @@
     <string name="group_restart_initial_sync_desc">Etwas ist schief gelaufen, als du die Synchronisation angeschaltet hast. Versuch es erneut.</string>
     <string name="add_first_bill">Füge deine erste Ausgabe hinzu</string>
     <string name="loading">Lädt...</string>
-    <string name="settled_up">Alles ausgeglichen!</string>
+    <string name="settled_up">Alle Schulden sind ausgeglichen!</string>
     <string name="screen_bill_details_title">Ausgabe</string>
     <string name="delete_expense">Ausgabe löschen</string>
     <string name="delete_expense_desc">Willst du diese Ausgabe wirklich löschen?</string>
@@ -104,4 +104,11 @@
     <string name="add_bill_shortcut_disabled">Diese Gruppe existiert nicht mehr</string>
     <string name="add_bill_shortcut_desc">Ausgabe eintragen in</string>
     <string name="transaction">Überweisung</string>
+    <string name="all_settled_up_title">Ihr habt es geschafft!</string>
+    <string name="minutes_ago">vor %1$d Minuten</string>
+    <string name="time_format">um %1$s Uhr</string>
+    <string name="date_format">am %1$s</string>
+    <string name="last_sync">Letzte Synchronisierung:</string>
+    <string name="yesterday_time_format">Gestern um %1$s Uhr</string>
+    <string name="just_now">gerade eben</string>
 </resources>
