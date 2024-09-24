@@ -1,6 +1,7 @@
 package digital.fischers.coinsaw.ui.viewModels
 
 import android.icu.text.DecimalFormat
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class AddBillViewModel @Inject constructor(
@@ -66,7 +68,7 @@ class AddBillViewModel @Inject constructor(
                     _newBillState.value = newBillState.value.copy(splitting = users.map {
                         var percent = percentPerUser
 
-                        if (it.id == randomUserId && remainingPercentage >= 0.01) {
+                        if (it.id == randomUserId && abs(remainingPercentage) >= 0.01) {
                             percent += remainingPercentage
                         }
 
@@ -138,7 +140,8 @@ class AddBillViewModel @Inject constructor(
     }
 
     private fun checkIfSplittingIs100Percent(): Boolean {
-        return newBillState.value.splitting.sumOf { it.percentage.toDouble() } == 100.0
+        val sum = newBillState.value.splitting.sumOf { it.percentage.toDouble() }
+        return sum > 99.99 && sum < 100.01
     }
 
     suspend fun createBill() {
