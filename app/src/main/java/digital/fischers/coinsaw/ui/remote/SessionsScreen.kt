@@ -156,6 +156,19 @@ fun SessionItem(
                     maxLines = 1,
                     modifier = Modifier.weight(1f, fill = false)
                 )
+                if (isOwnSession) {
+                    Text(
+                        text = stringResource(id = R.string.you),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.background
+                        ),
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.error)
+                            .padding(4.dp, 2.dp)
+                    )
+                }
                 if (session.admin) {
                     Text(
                         text = stringResource(id = R.string.share_admin),
