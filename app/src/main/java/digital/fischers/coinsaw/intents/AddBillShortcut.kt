@@ -19,6 +19,7 @@ fun pushAddBillShortcut(context: Context, groupId: String, groupName: String) {
             Intent(context, MainActivity::class.java)
                 .setAction(Intent.ACTION_VIEW)
                 .putExtra("groupId", groupId)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         )
         .build()
 

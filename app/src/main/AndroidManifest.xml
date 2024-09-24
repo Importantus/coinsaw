@@ -18,7 +18,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:launchMode="standard"
             android:theme="@style/Theme.Coinsaw">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
