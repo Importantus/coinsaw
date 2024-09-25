@@ -9,6 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.HiltAndroidApp
+import digital.fischers.coinsaw.notifications.NotificationHelper
 import digital.fischers.coinsaw.workers.SyncWorker
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -18,6 +19,9 @@ class CoinsawApplication : Application(), Configuration.Provider {
 
     @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -32,13 +36,16 @@ class CoinsawApplication : Application(), Configuration.Provider {
                 .setRequiresBatteryNotLow(true).build()
 
         val sync =
-            PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS).setConstraints(constraints)
+            PeriodicWorkRequestBuilder<SyncWorker>(5, TimeUnit.MINUTES).setConstraints(constraints)
                 .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             SyncWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             sync
         )
+
+        // Register the notification channels
+        notificationHelper.setUpNotificationChannels()
     }
 }

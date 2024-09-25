@@ -19,6 +19,7 @@ import digital.fischers.coinsaw.domain.changelog.EntryType
 import digital.fischers.coinsaw.domain.changelog.Payload
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
+import digital.fischers.coinsaw.notifications.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -32,7 +33,8 @@ class ChangelogProcessorImpl @Inject constructor(
     private val billDao: BillDao,
     private val changelogDao: ChangelogDao,
     private val calculatedTransactionRepository: CalculatedTransactionRepository,
-    private val remoteRepository: Lazy<RemoteRepository>
+    private val remoteRepository: Lazy<RemoteRepository>,
+    private val notificationHelper: Lazy<NotificationHelper>
 ) : ChangelogProcessor {
     override suspend fun processEntry(entry: Entry, fromRemote: Boolean) {
         // If changelog with this ID already exists, do nothing
@@ -50,7 +52,8 @@ class ChangelogProcessorImpl @Inject constructor(
                 timestamp = entry.timestamp,
                 groupId = entry.groupId,
                 synced = fromRemote,
-                content = entryJson
+                content = entryJson,
+                addedLocallyAt = System.currentTimeMillis()
             )
         )
 
@@ -181,6 +184,10 @@ class ChangelogProcessorImpl @Inject constructor(
         calculatedTransactionRepository.calculateForGroup(groupId)
 
         val group = groupDao.getGroup(groupId).firstOrNull()
+
+        if(fromRemote) {
+            notificationHelper.get().showChangelogNotification(entry)
+        }
 
         if(!fromRemote && group?.online == true) {
             CoroutineScope(Dispatchers.IO).launch {

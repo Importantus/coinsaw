@@ -30,10 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +57,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 import digital.fischers.coinsaw.ui.components.BaseScreen
@@ -67,6 +75,7 @@ import digital.fischers.coinsaw.ui.theme.successText
 import digital.fischers.coinsaw.ui.utils.getDate
 import digital.fischers.coinsaw.ui.utils.getTimeDifference
 import digital.fischers.coinsaw.ui.viewModels.GroupViewModel
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
@@ -113,6 +122,20 @@ fun GroupScreen(
     val syncing = groupViewModel.syncing
 
     var menuExpanded by remember { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(Unit) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            groupViewModel.setGroupOpen(true)
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            groupViewModel.setGroupOpen(false)
+        }
+    }
 
     BaseScreen(
         refreshing = syncing,

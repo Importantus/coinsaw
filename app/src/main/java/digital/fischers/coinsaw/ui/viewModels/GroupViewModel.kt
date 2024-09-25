@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.data.database.Group
@@ -119,13 +120,15 @@ class GroupViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    init {
-            viewModelScope.launch {
-                val group = groupRepository.getGroupStream(groupId).map {
-                    group -> groupUIStateFromGroup(group)
-                }.first()
-                pushAddBillShortcut(context, groupId, group.name)
-            }
+    override fun onCleared() {
+        super.onCleared()
+        setGroupOpen(false)
+    }
+
+    fun setGroupOpen(open: Boolean) {
+        viewModelScope.launch {
+            groupRepository.setGroupOpen(groupId, open)
+        }
     }
 
     fun syncGroup(group: GroupScreenUiStates.Group) {
