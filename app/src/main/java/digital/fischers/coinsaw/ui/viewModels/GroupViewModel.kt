@@ -16,13 +16,11 @@ import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepositor
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.RemoteRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
-import digital.fischers.coinsaw.intents.pushAddBillShortcut
 import digital.fischers.coinsaw.ui.group.GroupScreenUiStates
 import digital.fischers.coinsaw.ui.Screen
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,11 +34,8 @@ class GroupViewModel @Inject constructor(
     private val calculatedTransactionRepository: CalculatedTransactionRepository,
     private val billRepository: BillRepository,
     private val remoteRepository: RemoteRepository,
-    application: Application,
     savedStateHandle: SavedStateHandle
-) : AndroidViewModel(application) {
-    private val context = getApplication<Application>().applicationContext
-
+) : ViewModel() {
     val groupId: String = savedStateHandle.get<String>(Screen.ARG_GROUP_ID)!!
 
     var syncError by mutableStateOf(false)

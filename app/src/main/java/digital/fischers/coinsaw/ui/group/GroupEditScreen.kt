@@ -1,6 +1,5 @@
 package digital.fischers.coinsaw.ui.group
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -8,10 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -25,14 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
-import digital.fischers.coinsaw.intents.disableAddBillShortcut
 import digital.fischers.coinsaw.ui.components.BaseScreen
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButton
 import digital.fischers.coinsaw.ui.components.CustomFloatingActionButtonType
 import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.DeleteModal
 import digital.fischers.coinsaw.ui.viewModels.GroupEditViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -105,7 +100,6 @@ fun GroupEditScreen(
                     coroutineScope.launch {
                         viewModel.deleteGroup()
                     }.invokeOnCompletion {
-                        disableAddBillShortcut(context = context, groupId = groupId)
                         viewModel.hideDeleteModal()
                         onAfterDeleteNavigation()
                     }
