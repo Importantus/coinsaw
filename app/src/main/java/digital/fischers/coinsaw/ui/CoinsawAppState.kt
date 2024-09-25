@@ -9,11 +9,12 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 
-sealed class Screen(val route: String) {
+sealed class Screen(val route: String, val deepLinkPath: String? = null) {
     data object Home : Screen("home")
 
-    data object Group : Screen("group/{$ARG_GROUP_ID}") {
+    data object Group : Screen("group/{$ARG_GROUP_ID}", "/group") {
         fun createRoute(groupId: String) = "group/$groupId"
+        fun createDeepLink(groupId: String) = "${DEEP_LINK_HOST}group?$ARG_GROUP_ID=$groupId"
     }
 
     data object GroupSettings : Screen("group/{$ARG_GROUP_ID}/settings") {
@@ -48,8 +49,9 @@ sealed class Screen(val route: String) {
         fun createRoute(groupId: String, userId: String) = "newGroup/$groupId/editMember/$userId"
     }
 
-    data object AddBill : Screen("group/{$ARG_GROUP_ID}/addItem") {
+    data object AddBill : Screen("group/{$ARG_GROUP_ID}/addItem", "/addBill") {
         fun createRoute(groupId: String) = "group/$groupId/addItem"
+        fun createDeepLink(groupId: String) = "${DEEP_LINK_HOST}addBill?$ARG_GROUP_ID=$groupId"
     }
 
     data object MakeOnline : Screen("group/{$ARG_GROUP_ID}/makeOnline") {
@@ -91,6 +93,7 @@ sealed class Screen(val route: String) {
     }
 
     companion object {
+        const val DEEP_LINK_HOST = "coinsaw://coinsaw.fischers.digital/"
         const val ARG_GROUP_ID = "groupId"
         const val ARG_USER_ID = "userId"
         const val ARG_RECOVERY_TOKEN = "recoveryToken"

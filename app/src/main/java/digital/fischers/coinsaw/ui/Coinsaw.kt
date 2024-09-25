@@ -20,7 +20,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import digital.fischers.coinsaw.ui.bill.AddBillScreen
-import digital.fischers.coinsaw.ui.bill.AddTransactionArguments
 import digital.fischers.coinsaw.ui.bill.AddTransactionScreen
 import digital.fischers.coinsaw.ui.bill.BillDetailsScreen
 import digital.fischers.coinsaw.ui.group.GroupEditScreen
@@ -51,7 +50,7 @@ fun CoinsawApp(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             navController = appState.navController,
-            startDestination =  Screen.Home.route,
+            startDestination = Screen.Home.route,
             enterTransition = {
                 val initialDeep = getRouteDeepness(initialState.destination.route ?: "")
                 val targetDeep = getRouteDeepness(targetState.destination.route ?: "")
@@ -302,9 +301,30 @@ fun CoinsawApp(
         }
     }
 
-    val intentGroupId = intent?.getStringExtra("groupId")
-    if(intentGroupId != null) {
-        appState.navigateToAddBill(intentGroupId)
+    handleDeepLink(intent, appState)
+}
+
+fun handleDeepLink(intent: Intent?, appState: CoinsawAppState) {
+    val data = intent?.data
+    if (data != null) {
+        // The deep link is of the form coinsaw://coinsaw.fischers.digital/group?groupId=12345 or coinsaw://coinsaw.fischers.digital/group/addBill?groupId=12345
+        // The actual route is group/{$ARG_GROUP_ID} or group/{$ARG_GROUP_ID}/addBill etc
+        // The form of specific deeplinks and the corresponding routes are defined in a Screen Object eg Screen.Group.deepLink and Screen.Group.route
+        val path = data.path ?: ""
+        Log.d("CoinsawApp", "Deep link: $path")
+        when (path) {
+            Screen.Group.deepLinkPath -> {
+                val groupId = data.getQueryParameter(Screen.ARG_GROUP_ID) ?: ""
+                if (groupId.isNotEmpty())
+                    appState.navigateToGroup(groupId)
+            }
+
+            Screen.AddBill.deepLinkPath -> {
+                val groupId = data.getQueryParameter(Screen.ARG_GROUP_ID) ?: ""
+                if (groupId.isNotEmpty())
+                    appState.navigateToAddBill(groupId)
+            }
+        }
     }
 }
 
