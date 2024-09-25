@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.data.repository
 
+import android.util.Log
 import digital.fischers.coinsaw.data.database.BillDao
 import digital.fischers.coinsaw.data.database.CalculatedTransactionDao
 import digital.fischers.coinsaw.data.database.ChangelogDao
@@ -41,6 +42,13 @@ class GroupRepositoryImpl @Inject constructor(
 
     override fun getGroupStream(groupId: String): Flow<Group?> {
         return groupDao.getGroup(groupId)
+    }
+
+    override suspend fun setGroupOpen(groupId: String, open: Boolean) {
+        if (open)
+            groupDao.setGroupLastOpened(groupId, System.currentTimeMillis())
+        Log.d("GroupRepositoryImpl", "Setting group $groupId open to $open")
+        groupDao.setGroupOpen(groupId, open)
     }
 
     override suspend fun updateGroup(groupId: String, changes: Payload.GroupSettings) {

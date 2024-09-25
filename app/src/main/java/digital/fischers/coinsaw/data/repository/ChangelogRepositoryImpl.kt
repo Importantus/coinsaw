@@ -33,16 +33,10 @@ class ChangelogRepositoryImpl @Inject constructor(
         return changelogDao.getEntriesByGroupOlderThanTimestamp(groupId, timestamp)
     }
 
-    override suspend fun insert(entry: Entry) {
-        val entryJson = Gson().toJson(entry)
-        changelogDao.insert(
-            Changelog(
-                id = entry.id,
-                timestamp = entry.timestamp,
-                groupId = entry.groupId,
-                synced = entry.syncTimestamp != null,
-                content = entryJson
-            )
-        )
+    override fun getChangelogByGroupAddedLocallyAfterTimestampSynced(
+        groupId: String,
+        timestamp: Long
+    ): Flow<List<Changelog>> {
+        return changelogDao.getEntriesByGroupLocallyAddedAfterTimestampSynced(groupId, timestamp)
     }
 }

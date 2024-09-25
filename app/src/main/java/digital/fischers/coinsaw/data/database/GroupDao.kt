@@ -21,6 +21,12 @@ interface GroupDao {
     @Query("SELECT * FROM groups WHERE online = 0")
     fun getOfflineGroups(): Flow<List<Group>>
 
+    @Query("UPDATE groups SET open = :open WHERE id = :groupId")
+    suspend fun setGroupOpen(groupId: String, open: Boolean)
+
+    @Query("UPDATE groups SET lastOpenedAt = :timestamp WHERE id = :groupId")
+    suspend fun setGroupLastOpened(groupId: String, timestamp: Long)
+
     @Insert
     suspend fun insert(group: Group)
 

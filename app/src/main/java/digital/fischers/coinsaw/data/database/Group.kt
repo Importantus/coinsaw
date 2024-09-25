@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.data.database
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -14,5 +15,7 @@ data class Group(
     val accessToken: String?,
     val sessionId: String?,
     val lastSync: Long?,
-    val createdAt: Long
+    val createdAt: Long,
+    @ColumnInfo(defaultValue = "null") val open: Boolean? = null,
+    @ColumnInfo(defaultValue = "null") val lastOpenedAt: Long? = null
 )

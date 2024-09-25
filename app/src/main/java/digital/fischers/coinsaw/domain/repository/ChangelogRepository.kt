@@ -9,6 +9,5 @@ interface ChangelogRepository {
     fun getChangelogByGroupStream(groupId: String): Flow<List<Changelog>>
     fun getChangelogByGroupYoungerThanTimestampStream(groupId: String, timestamp: Long): Flow<List<Changelog>>
     fun getChangelogByGroupOlderThanTimestampStream(groupId: String, timestamp: Long): Flow<List<Changelog>>
-
-    suspend fun insert(entry: Entry)
+    fun getChangelogByGroupAddedLocallyAfterTimestampSynced(groupId: String, timestamp: Long): Flow<List<Changelog>>
 }
