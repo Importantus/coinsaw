@@ -112,4 +112,14 @@
     <string name="last_sync">Last sync:</string>
     <string name="yesterday_time_format">yesterday at %1$s</string>
     <string name="just_now">just now</string>
+    <string name="notification_group_settings_title">Updated settings for %1$s</string>
+    <string name="notification_group_settings_message">The new currency is %1$s</string>
+    <string name="notification_new_user_title">New user in group %1$s</string>
+    <string name="notification_new_user_message">The user %1$s was added to %2$s</string>
+    <string name="notification_new_transaction_title">New transaction in group %1$s</string>
+    <string name="notification_new_transaction_message">%1$s payed %2$s to %3$s</string>
+    <string name="notification_new_bill_title">New expense in %1$s</string>
+    <string name="notification_new_bill_message">%1$s payed %2$s for \"%3$s\"</string>
+    <string name="channel_changelog">Group events</string>
+    <string name="channel_changelog_description">Notifications for new expenses, users or group configuration changes</string>
 </resources>

@@ -111,4 +111,14 @@
     <string name="last_sync">Letzte Synchronisierung:</string>
     <string name="yesterday_time_format">Gestern um %1$s Uhr</string>
     <string name="just_now">gerade eben</string>
+    <string name="notification_group_settings_title">Einstellungen für %1$s geändert</string>
+    <string name="notification_group_settings_message">Die neue Währung ist \"%1$s\"</string>
+    <string name="notification_new_user_title">Neuer Nutzer in %1$s</string>
+    <string name="notification_new_user_message">Der Nutzer %1$s wurde zur Gruppe %2$s hinzugefügt</string>
+    <string name="notification_new_transaction_title">Neue Überweisung in %1$s</string>
+    <string name="notification_new_transaction_message">%1$s hat %2$s an %3$s überwiesen</string>
+    <string name="notification_new_bill_title">Neue Ausgabe in %1$s</string>
+    <string name="notification_new_bill_message">%1$s hat %2$s für \"%3$s\" ausgegeben</string>
+    <string name="channel_changelog">Ereignisse in Gruppen</string>
+    <string name="channel_changelog_description">Benachrichtigungen für neue Ausgaben, Nutzer oder Konfigurationsänderungen</string>
 </resources>
