@@ -1,10 +1,11 @@
 package digital.fischers.coinsaw.notifications
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
@@ -46,21 +47,28 @@ class NotificationHelper(
         }
     }
 
+    fun askForNotificationPermission(activity: Activity) {
+        if (notificationManager.areNotificationsEnabled()) return
+        requestPermissions(
+            activity,
+            arrayOf("android.permission.POST_NOTIFICATIONS"),
+            1
+        )
+    }
+
     private fun dismissNotification(id: Int) {
         notificationManager.cancel(id)
     }
 
     suspend fun showChangelogNotification(entry: Entry) {
-        // Show a notification for the changelog entry
+        if (!notificationManager.areNotificationsEnabled()) return
         val notification = entry.toNotification(context, groupRepository, userRepository) ?: return
-        Log.d("NotificationHelper", "Showing notification for entry ${entry.id.hashCode()}")
         notificationManager.notify(entry.id.hashCode(), notification)
     }
 
     fun clearGroupNotifications(lifecycleOwner: LifecycleOwner) {
         groupRepository.getAllGroupsStream().asLiveData().observe(lifecycleOwner) { groups ->
             groups.forEach { group ->
-                Log.d("NotificationHelper", "Checking group ${group.name} ${group.open}")
                 if (group.open == true) {
                     val liveData =
                         changelogRepository.getChangelogByGroupAddedLocallyAfterTimestampSynced(
@@ -71,7 +79,6 @@ class NotificationHelper(
 
                     liveData.observe(lifecycleOwner) { changelog ->
                         changelog.forEach { entry ->
-                            Log.d("NotificationHelper", "Dismissing notification for entry ${entry.id.hashCode()}")
                             dismissNotification(entry.id.hashCode())
                         }
                     }
@@ -79,7 +86,6 @@ class NotificationHelper(
                     groupObservers[group.id] = liveData
                 } else {
                     // Cancel observer
-                    Log.d("NotificationHelper", "Removing observer for group ${group.id}")
                     groupObservers[group.id]?.removeObservers(lifecycleOwner)
                 }
             }

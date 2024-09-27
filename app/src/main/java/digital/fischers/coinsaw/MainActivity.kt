@@ -31,7 +31,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        shortcutHelper.groupObserver(this)
-        notificationHelper.clearGroupNotifications(this)
+        try {
+            notificationHelper.askForNotificationPermission(this)
+
+            shortcutHelper.groupObserver(this)
+            notificationHelper.clearGroupNotifications(this)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error setting up notifications", e)
+        }
     }
 }
