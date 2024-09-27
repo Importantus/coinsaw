@@ -24,6 +24,7 @@ fun AddMemberScreen(
     val groupId = viewModel.groupId
     val loading = viewModel.loading
     val newUserState by viewModel.newUserState.collectAsState()
+    val valid = viewModel.valid
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -37,6 +38,7 @@ fun AddMemberScreen(
         },
         floatingActionButton = {
             CustomFloatingActionButton(
+                enabled = valid,
                 onClick = {
                     coroutineScope.launch {
                         viewModel.createUser()

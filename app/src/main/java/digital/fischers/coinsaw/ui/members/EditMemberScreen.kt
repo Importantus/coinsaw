@@ -22,6 +22,7 @@ fun EditMemberScreen(
     val loading = viewModel.loading
     val name = viewModel.userName
     val isMe = viewModel.isMe
+    val valid = viewModel.valid
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -35,6 +36,7 @@ fun EditMemberScreen(
         },
         floatingActionButton = {
             CustomFloatingActionButton(
+                enabled = valid,
                 onClick = {
                     coroutineScope.launch {
                         viewModel.saveChanges()

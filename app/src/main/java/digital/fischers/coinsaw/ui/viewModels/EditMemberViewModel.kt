@@ -23,6 +23,9 @@ class EditMemberViewModel @Inject constructor(
     val groupId = savedStateHandle.get<String>(Screen.ARG_GROUP_ID)!!
     val userId = savedStateHandle.get<String>(Screen.ARG_USER_ID)!!
 
+    var valid by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             loadUser()
@@ -37,6 +40,7 @@ class EditMemberViewModel @Inject constructor(
         isMe = user?.isMe ?: false
         oldState = user
         loading = false
+        valid = checkIfNameIsValid(userName)
     }
 
     var userName by mutableStateOf("")
@@ -58,7 +62,12 @@ class EditMemberViewModel @Inject constructor(
         )
     }
 
+    private fun checkIfNameIsValid(name: String): Boolean {
+        return name.isNotBlank() && name.length > 2 && name.length < 75
+    }
+
     fun onNameChanged(name: String) {
+        valid = checkIfNameIsValid(name)
         userName = name
     }
 
@@ -85,7 +94,7 @@ class EditMemberViewModel @Inject constructor(
                 groupId = groupId,
                 Payload.User(
                     id = userId,
-                    name = userName
+                    name = userName.trim()
                 )
             )
         }

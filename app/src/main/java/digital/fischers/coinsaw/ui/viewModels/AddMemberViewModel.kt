@@ -20,6 +20,9 @@ class AddMemberViewModel @Inject constructor(
 ) : ViewModel() {
     val groupId = savedStateHandle.get<String>(Screen.ARG_GROUP_ID)!!
 
+    var valid by mutableStateOf(false)
+        private set
+
     var loading by mutableStateOf(false)
         private set
 
@@ -27,6 +30,7 @@ class AddMemberViewModel @Inject constructor(
     val newUserState = _newUserState.asStateFlow()
 
     fun onNameChanged(name: String) {
+        valid = name.isNotBlank() && name.length > 2 && name.length < 75
         _newUserState.value = _newUserState.value.copy(name = name)
     }
 
@@ -35,8 +39,12 @@ class AddMemberViewModel @Inject constructor(
     }
 
     suspend fun createUser() {
+        if (!valid) return
         loading = true
-        userRepository.createUser(groupId, _newUserState.value)
+        userRepository.createUser(
+            groupId,
+            CreateUiStates.User(_newUserState.value.name.trim(), _newUserState.value.isMe)
+        )
         _newUserState.value = CreateUiStates.User()
         loading = false
     }
