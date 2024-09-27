@@ -37,6 +37,9 @@ class GroupEditViewModel @Inject constructor(
     var showDeleteModal: Boolean by mutableStateOf(false)
         private set
 
+    var valid by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             loadGroup()
@@ -47,10 +50,16 @@ class GroupEditViewModel @Inject constructor(
         val group = groupRepository.getGroupStream(groupId).firstOrNull()
         groupName = group?.name ?: ""
         groupCurrency = group?.currency ?: ""
+        valid = isNameValid(groupName)
         loading = false
     }
 
+    private fun isNameValid(name: String): Boolean {
+        return name.isNotBlank() && name.length >= 3 && name.length <= 75
+    }
+
     fun onNameChanged(name: String) {
+        valid = isNameValid(name)
         groupName = name
     }
 
@@ -68,7 +77,7 @@ class GroupEditViewModel @Inject constructor(
 
     suspend fun updateGroup() {
         groupRepository.updateGroup(groupId, Payload.GroupSettings(
-            name = groupName,
+            name = groupName.trim(),
             currency = groupCurrency
         ))
     }

@@ -22,7 +22,11 @@ class NewGroupViewModel @Inject constructor(
     var currency by mutableStateOf("€")
         private set
 
+    var valid by mutableStateOf(false)
+        private set
+
     fun onGroupNameChanged(name: String) {
+        valid = name.isNotBlank() && name.length >= 3 && name.length <= 75
         groupName = name
     }
 
@@ -34,7 +38,7 @@ class NewGroupViewModel @Inject constructor(
         loading = true
         val group = groupRepository.createGroup(
             CreateUiStates.Group(
-                name = groupName,
+                name = groupName.trim(),
                 currency = currency
             )
         )

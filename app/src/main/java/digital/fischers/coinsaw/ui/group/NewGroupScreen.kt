@@ -32,6 +32,7 @@ fun NewGroupScreen(
     val groupName = viewModel.groupName
     val currency = viewModel.currency
     val loading = viewModel.loading
+    val valid = viewModel.valid
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -46,6 +47,7 @@ fun NewGroupScreen(
         },
         floatingActionButton = {
             CustomFloatingActionButton(
+                enabled = valid,
                 onClick = {
                     coroutineScope.launch {
                         val groupId = viewModel.createGroup()

@@ -41,6 +41,7 @@ fun GroupEditScreen(
     val loading = viewModel.loading
     val groupId = viewModel.groupId
     val showDeleteModal = viewModel.showDeleteModal
+    val valid = viewModel.valid
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -55,6 +56,7 @@ fun GroupEditScreen(
         },
         floatingActionButton = {
             CustomFloatingActionButton(
+                enabled = valid,
                 onClick = {
                     coroutineScope.launch {
                         viewModel.updateGroup()
