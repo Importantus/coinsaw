@@ -36,7 +36,7 @@ class CoinsawApplication : Application(), Configuration.Provider {
                 .setRequiresBatteryNotLow(true).build()
 
         val sync =
-            PeriodicWorkRequestBuilder<SyncWorker>(5, TimeUnit.MINUTES).setConstraints(constraints)
+            PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.HOURS).setConstraints(constraints)
                 .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
