@@ -24,7 +24,10 @@ suspend fun Entry.toNotification(
 ): Notification? {
     val group = groupRepository.getGroupStream(groupId).firstOrNull() ?: return null
 
+    // Don't show notifications for open groups
     if(group.open == true) return null
+    // Don't show notifications for groups that haven't been synced yet (i.e. first sync)
+    if(group.lastSync == null) return null
 
     val (title, message) = when (type) {
         EntryType.SETTINGS -> {
