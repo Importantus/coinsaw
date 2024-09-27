@@ -14,8 +14,8 @@ android {
         applicationId = "digital.fischers.coinsaw"
         minSdk = 24
         targetSdk = 34
-        versionCode = 9
-        versionName = "0.0.7.1"
+        versionCode = 10
+        versionName = "0.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
