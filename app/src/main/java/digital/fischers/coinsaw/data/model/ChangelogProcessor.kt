@@ -186,7 +186,9 @@ class ChangelogProcessorImpl @Inject constructor(
         val group = groupDao.getGroup(groupId).firstOrNull()
 
         if(fromRemote) {
-            notificationHelper.get().showChangelogNotification(entry)
+            CoroutineScope(Dispatchers.IO).launch {
+                notificationHelper.get().showChangelogNotification(entry)
+            }
         }
 
         if(!fromRemote && group?.online == true) {
