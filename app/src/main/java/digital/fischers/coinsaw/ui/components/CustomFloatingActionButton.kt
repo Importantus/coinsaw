@@ -20,12 +20,13 @@ enum class CustomFloatingActionButtonType {
 @Composable
 fun CustomFloatingActionButton(
     onClick: () -> Unit,
+    enabled: Boolean = true,
     type: CustomFloatingActionButtonType,
     contentDescription: String? = null
 ) {
     FloatingActionButton(
-        onClick = onClick,
-        containerColor = MaterialTheme.colorScheme.primary,
+        onClick = { if (enabled) onClick() },
+        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = if(enabled) 1f else 0.5f),
         contentColor = MaterialTheme.colorScheme.onPrimary,
         modifier = Modifier.imePadding()
     ) {
