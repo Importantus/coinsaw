@@ -1,5 +1,6 @@
 package digital.fischers.coinsaw.ui.bill
 
+import android.icu.text.DecimalFormat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -342,7 +343,7 @@ fun SplittingElement(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BasicTextField(
-                    value = percentToString(splitting.percentage, if(textBoxFocused.value) "" else "0.00"),
+                    value = percentToString(splitting.percentage, if(textBoxFocused.value) "" else String.format(Locale.getDefault(), "%.2f", 0.00)),
                     singleLine = true,
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),

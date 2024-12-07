@@ -106,6 +106,8 @@ class AddBillViewModel @Inject constructor(
                 edited = false
             )
         }
+
+        percentRemaining = 0.0
     }
 
     fun resetSplittings() {
@@ -145,18 +147,13 @@ class AddBillViewModel @Inject constructor(
         val editedSplittings = newSplittings.filter { it.edited }
         val editedSum = editedSplittings.sumOf { it.percentage }
 
-        var remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
+        val remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
         val remainingSum = 100.0 - editedSum
-
-        /**
-         * TODO: Don't let the percents go below 0 or above 100
-         * The remaining sum has to be distributed to the remaining, non-edited splittings
-         * If all of these splittings are 0 or 100, the remaining sum has to be distributed to all of them
-         */
 
         if(remainingSplittings.isNotEmpty()) {
             val remainingPerUser = remainingSum / remainingSplittings.size
-            val remainingPerUserRounded = DecimalFormat("#.##").format(remainingPerUser).toDouble()
+            // Round to 2 decimal places
+            val remainingPerUserRounded = remainingPerUser.roundHalfUp(2)
 
             newSplittings.forEachIndexed { i, splitting ->
                 if (!splitting.edited) {
@@ -164,21 +161,6 @@ class AddBillViewModel @Inject constructor(
                 }
             }
         }
-
-//        remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
-//
-//        if(remainingSplittings.isEmpty() && remainingSum > 0.0) {
-//            // Normalize edited splittings
-//            val remainingSumRounded = DecimalFormat("#.##").format(remainingSum).toDouble()
-//
-//            Log.d("AddBillViewModel", "onSplittingChanged: $remainingSumRounded, ${editedSplittings.size}")
-//
-//            newSplittings.forEachIndexed { i, splitting ->
-//                if (splitting.edited && splitting.userId != userId) {
-//                    newSplittings[i] = splitting.copy(percentage = (newSplittings[i].percentage + (remainingSumRounded / (editedSplittings.size - 1))))
-//                }
-//            }
-//        }
 
         splittings.value = newSplittings
 
