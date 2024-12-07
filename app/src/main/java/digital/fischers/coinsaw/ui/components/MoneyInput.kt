@@ -29,11 +29,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import digital.fischers.coinsaw.ui.utils.formatAsDecimal
+import java.util.Locale
 
 @Composable
 fun MoneyInput(
-    onValueChanged: (String) -> Unit,
-    value: String,
+    onValueChanged: (Double) -> Unit,
+    value: Double,
     currency: String = "€"
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -64,7 +66,7 @@ fun MoneyInput(
                 .weight(1f)
         ) {
             BasicTextField(
-                value = value,
+                value = moneyToString(value),
                 singleLine = true,
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -76,14 +78,14 @@ fun MoneyInput(
                     fontWeight = FontWeight.Light,
                     fontSize = 48.sp
                 ),
-                onValueChange = { onValueChanged(it) },
+                onValueChange = { onValueChanged(stringToMoney(it)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
                     .background(Color.Transparent)
                     .padding(8.dp)
             )
-            if (value.isEmpty()) {
+            if (value == 0.0) {
                 Text(
                     text = "0.00", modifier = Modifier
                         .fillMaxWidth()
@@ -109,4 +111,16 @@ fun MoneyInput(
             )
         )
     }
+}
+
+fun moneyToString(value: Double): String {
+    return if (value == 0.0) {
+        ""
+    } else {
+        String.format(Locale.getDefault(), "%.2f", value)
+    }
+}
+
+fun stringToMoney(value: String): Double {
+    return value.formatAsDecimal().toDoubleOrNull() ?: 0.0
 }

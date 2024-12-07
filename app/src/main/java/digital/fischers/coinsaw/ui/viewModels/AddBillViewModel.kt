@@ -2,14 +2,17 @@ package digital.fischers.coinsaw.ui.viewModels
 
 import android.icu.text.DecimalFormat
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import digital.fischers.coinsaw.data.database.User
 import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
@@ -20,11 +23,13 @@ import digital.fischers.coinsaw.ui.utils.roundHalfUp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
+import kotlin.math.min
 
 @HiltViewModel
 class AddBillViewModel @Inject constructor(
@@ -52,6 +57,8 @@ class AddBillViewModel @Inject constructor(
         scope = viewModelScope, started = WhileSubscribed(5_000L), initialValue = emptyList()
     )
 
+    val splittings = MutableStateFlow(emptyList<TempSplitting>())
+
     private var _newBillState = MutableStateFlow(CreateUiStates.Bill())
     val newBillState = _newBillState.asStateFlow()
 
@@ -59,23 +66,7 @@ class AddBillViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getUsersByGroupIdAndIsDeletedStream(groupId, false).firstOrNull()
                 ?.let { users ->
-                    val total = users.size
-                    val percentPerUser = (100.0 / total).roundHalfUp()
-                    val remainingPercentage = 100.0 - (percentPerUser * total)
-
-                    val randomUserId = users.random().id
-
-                    _newBillState.value = newBillState.value.copy(splitting = users.map {
-                        var percent = percentPerUser
-
-                        if (it.id == randomUserId && abs(remainingPercentage) >= 0.01) {
-                            percent += remainingPercentage
-                        }
-
-                        CreateUiStates.Splitting(
-                            userId = it.id, percentage = percent.toString()
-                        )
-                    })
+                    calculateSplittings(users)
                 }
         }
 
@@ -86,43 +77,113 @@ class AddBillViewModel @Inject constructor(
                 payerId = payerId
             )
         }
+
+        viewModelScope.launch {
+            newBillState.collect {
+                checkIfValid()
+            }
+        }
+    }
+
+    private fun calculateSplittings(users: List<User>) {
+        val total = users.size
+        val percentPerUser = (100.0 / total).roundHalfUp()
+        val remainingPercentage = 100.0 - (percentPerUser * total)
+
+        val randomUserId = users.random().id
+
+        splittings.value = users.map {
+            var percent = percentPerUser
+
+            if (it.id == randomUserId && abs(remainingPercentage) >= 0.01) {
+                percent += remainingPercentage
+            }
+
+            TempSplitting(
+                userId = it.id,
+                percentage = percent,
+                enabled = true,
+                edited = false
+            )
+        }
+    }
+
+    fun resetSplittings() {
+        calculateSplittings(users.value)
     }
 
     fun getUserById(userId: String) = users.value.find { it.id == userId }
 
     fun onNameChanged(name: String) {
         _newBillState.value = _newBillState.value.copy(name = name)
-        checkIfValid()
+//        checkIfValid()
     }
 
-    fun onAmountChanged(value: String) {
-        val amount = value.formatAsDecimal(2)
-
-        _newBillState.value = _newBillState.value.copy(amount = amount)
-        checkIfValid()
+    fun onAmountChanged(value: Double) {
+        _newBillState.value = _newBillState.value.copy(amount = value)
+//        checkIfValid()
     }
 
     fun onPayerChanged(payerId: String) {
         _newBillState.value = _newBillState.value.copy(payerId = payerId)
-        checkIfValid()
+//        checkIfValid()
     }
 
-    fun onSplittingChanged(userId: String, percentage: String) {
-        var amount = percentage.formatAsDecimal(2)
-        // If the amount is empty, set it to 0
-        if (amount.isBlank()) {
-            amount = "0"
+    fun onSplittingChanged(userId: String, value: Double) {
+        var percentage = value
+        if(percentage < 0.0) {
+            percentage = 0.0
+        } else if(percentage > 100.0) {
+            percentage = 100.0
         }
 
-        _newBillState.value = newBillState.value.copy(splitting = newBillState.value.splitting.map {
-            if (it.userId == userId) {
-                it.copy(percentage = amount)
-            } else {
-                it
-            }
-        })
+        val newSplittings = splittings.value.toMutableList()
+        val index = newSplittings.indexOfFirst { it.userId == userId }
+        newSplittings[index] = newSplittings[index].copy(percentage = percentage, edited = true)
 
-        percentRemaining = 100.0 - newBillState.value.splitting.sumOf { it.percentage.toDouble() }
+        // Update all other non edited splittings to keep the total at 100%
+        val editedSplittings = newSplittings.filter { it.edited }
+        val editedSum = editedSplittings.sumOf { it.percentage }
+
+        var remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
+        val remainingSum = 100.0 - editedSum
+
+        /**
+         * TODO: Don't let the percents go below 0 or above 100
+         * The remaining sum has to be distributed to the remaining, non-edited splittings
+         * If all of these splittings are 0 or 100, the remaining sum has to be distributed to all of them
+         */
+
+        if(remainingSplittings.isNotEmpty()) {
+            val remainingPerUser = remainingSum / remainingSplittings.size
+            val remainingPerUserRounded = DecimalFormat("#.##").format(remainingPerUser).toDouble()
+
+            newSplittings.forEachIndexed { i, splitting ->
+                if (!splitting.edited) {
+                    newSplittings[i] = splitting.copy(percentage = if(remainingPerUserRounded <= 0) 0.0 else remainingPerUserRounded)
+                }
+            }
+        }
+
+//        remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
+//
+//        if(remainingSplittings.isEmpty() && remainingSum > 0.0) {
+//            // Normalize edited splittings
+//            val remainingSumRounded = DecimalFormat("#.##").format(remainingSum).toDouble()
+//
+//            Log.d("AddBillViewModel", "onSplittingChanged: $remainingSumRounded, ${editedSplittings.size}")
+//
+//            newSplittings.forEachIndexed { i, splitting ->
+//                if (splitting.edited && splitting.userId != userId) {
+//                    newSplittings[i] = splitting.copy(percentage = (newSplittings[i].percentage + (remainingSumRounded / (editedSplittings.size - 1))))
+//                }
+//            }
+//        }
+
+        splittings.value = newSplittings
+
+        val percentageSum = splittings.value.sumOf { it.percentage }
+        percentRemaining = if(100.0 - splittings.value.sumOf { it.percentage } > (-0.1)) abs(100.0 - percentageSum) else 100.0 - percentageSum
 
         checkIfValid()
     }
@@ -131,16 +192,18 @@ class AddBillViewModel @Inject constructor(
         val nameIsValid =
             newBillState.value.name.isNotBlank() && newBillState.value.name.length <= 50
         val amountIsValid = try {
-            newBillState.value.amount.isNotBlank() && newBillState.value.amount.toDouble() > 0
+            newBillState.value.amount > 0
         } catch (e: NumberFormatException) {
             false
         }
+
+        Log.d("AddBillViewModel", "checkIfValid: ${checkIfSplittingIs100Percent()} $nameIsValid $amountIsValid")
 
         valid = checkIfSplittingIs100Percent() && nameIsValid && amountIsValid
     }
 
     private fun checkIfSplittingIs100Percent(): Boolean {
-        val sum = newBillState.value.splitting.sumOf { it.percentage.toDouble() }
+        val sum = splittings.value.sumOf { it.percentage }
         return sum > 99.99 && sum < 100.01
     }
 
@@ -150,7 +213,21 @@ class AddBillViewModel @Inject constructor(
             loading = false
             return
         }
-        billRepository.createBill(groupId, newBillState.value)
+        billRepository.createBill(groupId, newBillState.value.copy(
+            splitting = splittings.value.map {
+                CreateUiStates.Splitting(
+                    userId = it.userId,
+                    percentage = it.percentage.toString()
+                )
+            }
+        ))
         loading = false
     }
 }
+
+data class TempSplitting(
+    val userId: String,
+    val percentage: Double,
+    val enabled: Boolean,
+    val edited: Boolean
+)

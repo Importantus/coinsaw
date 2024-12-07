@@ -473,7 +473,7 @@ fun GroupScreen(
                                             AddTransactionArguments(
                                                 payeeId = payee.id,
                                                 payerId = payer.id,
-                                                amount = transaction.amount.toString()
+                                                amount = transaction.amount
                                             )
                                         )
                                     }

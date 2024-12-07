@@ -1,8 +1,10 @@
 package digital.fischers.coinsaw.ui.bill
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,18 +18,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,25 +33,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import digital.fischers.coinsaw.R
 import digital.fischers.coinsaw.data.database.User
@@ -64,9 +57,11 @@ import digital.fischers.coinsaw.ui.components.CustomNavigationBar
 import digital.fischers.coinsaw.ui.components.MoneyInput
 import digital.fischers.coinsaw.ui.components.UserSelection
 import digital.fischers.coinsaw.ui.components.getBottomLineShape
-import digital.fischers.coinsaw.ui.utils.CreateUiStates
+import digital.fischers.coinsaw.ui.utils.formatAsDecimal
 import digital.fischers.coinsaw.ui.viewModels.AddBillViewModel
+import digital.fischers.coinsaw.ui.viewModels.TempSplitting
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -85,6 +80,7 @@ fun AddBillScreen(
     val state by viewModel.newBillState.collectAsState()
 
     val remainingPercentage = viewModel.percentRemaining
+    val splittings by viewModel.splittings.collectAsState()
 
     val loading = viewModel.loading
 
@@ -98,7 +94,32 @@ fun AddBillScreen(
             CustomNavigationBar(
                 title = stringResource(id = R.string.screen_add_expense_title),
                 backNavigationText = null,
-                backNavigation = { onBackNavigation(groupId) })
+                backNavigation = { onBackNavigation(groupId) },
+                menu = {
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .padding(5.dp)
+                            .alpha(if (valid) 1f else 0.5f)
+                            .let {
+                                if (valid) it.clickable {
+                                    coroutineScope.launch {
+                                        viewModel.createBill()
+                                        onForwardNavigation(groupId)
+                                    }
+                                } else it
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_check),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = if (valid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            )
         },
         topColor = MaterialTheme.colorScheme.secondary
     ) {
@@ -153,50 +174,15 @@ fun AddBillScreen(
             ) {
                 SplittingSection(
                     users = users,
-                    splittings = state.splitting,
+                    splittings = splittings,
                     onSplittingChanged = { userId, percentage ->
                         viewModel.onSplittingChanged(userId, percentage)
                     },
+                    resetSplittings = {
+                        viewModel.resetSplittings()
+                    },
                     percentRemaining = remainingPercentage
                 )
-            }
-            Box(
-                modifier = Modifier
-                    .clip(
-                        RoundedCornerShape(
-                            topStart = 10.dp,
-                            topEnd = 10.dp
-                        )
-                    )
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.15f)
-                    .background(MaterialTheme.colorScheme.secondary),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(
-                    enabled = valid,
-                    shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.surface
-                    ),
-                    onClick = {
-                        coroutineScope.launch {
-                            viewModel.createBill()
-                            onForwardNavigation(groupId)
-                        }
-                    }
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 34.dp, vertical = 4.dp),
-                        text = stringResource(id = R.string.add_expense_save),
-                        style = TextStyle(
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                }
             }
         }
 
@@ -246,8 +232,9 @@ fun TitleInput(
 @Composable
 fun SplittingSection(
     users: List<User>,
-    splittings: List<CreateUiStates.Splitting>,
-    onSplittingChanged: (String, String) -> Unit,
+    splittings: List<TempSplitting>,
+    resetSplittings: () -> Unit,
+    onSplittingChanged: (String, Double) -> Unit,
     percentRemaining: Double
 ) {
     Column {
@@ -256,7 +243,15 @@ fun SplittingSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = stringResource(id = R.string.add_expense_percent_remaining))
-            Text(text = "%.1f".format(percentRemaining) + "%")
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (splittings.any { it.edited }) {
+                    Text(text = "reset", modifier = Modifier.clickable { resetSplittings() })
+                }
+                Text(text = "%.1f".format(percentRemaining) + "%")
+            }
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -279,13 +274,20 @@ fun SplittingSection(
 @Composable
 fun SplittingElement(
     users: List<User>,
-    splitting: CreateUiStates.Splitting,
-    onSplittingChanged: (String, String) -> Unit
+    splitting: TempSplitting,
+    onSplittingChanged: (String, Double) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
     val interactionSource = remember {
         MutableInteractionSource()
     }
+
+    val textBoxFocused = remember { mutableStateOf(false) }
+
+    val animatedWidth by animateFloatAsState(
+        targetValue = splitting.percentage.toFloat() / 100,
+        label = "splittingWidth ${splitting.userId}"
+    )
 
     Box(
         modifier = Modifier
@@ -293,10 +295,17 @@ fun SplittingElement(
             .clip(MaterialTheme.shapes.small)
             .height(60.dp)
             .background(MaterialTheme.colorScheme.surface)
+            .alpha(if (splitting.edited) 1f else 0.5f)
+            .pointerInput(Unit) {
+                detectDragGestures { change, _ ->
+                    val newPercentage = (change.position.x / size.width).coerceIn(0f, 1f)
+                    onSplittingChanged(splitting.userId, newPercentage.toDouble() * 100)
+                }
+            }
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth(splitting.percentage.toFloat() / 100)
+                .fillMaxWidth(animatedWidth)
                 .clip(MaterialTheme.shapes.small)
                 .background(MaterialTheme.colorScheme.secondary)
         ) {
@@ -333,7 +342,7 @@ fun SplittingElement(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BasicTextField(
-                    value = splitting.percentage,
+                    value = percentToString(splitting.percentage, if(textBoxFocused.value) "" else "0.00"),
                     singleLine = true,
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -342,9 +351,12 @@ fun SplittingElement(
                         fontWeight = FontWeight.Light,
                         fontSize = 16.sp
                     ),
-                    onValueChange = { onSplittingChanged(splitting.userId, it) },
+                    onValueChange = { onSplittingChanged(splitting.userId, stringToPercent(it)) },
                     modifier = Modifier
                         .weight(1f)
+                        .onFocusChanged {
+                            textBoxFocused.value = it.isFocused
+                        }
                         .focusRequester(focusRequester)
                 )
 
@@ -361,5 +373,17 @@ fun SplittingElement(
             }
         }
     }
+}
+
+fun percentToString(value: Double, nullValue: String = ""): String {
+    return if (value == 0.0) {
+        nullValue
+    } else {
+        String.format(Locale.getDefault(), "%.2f", value)
+    }
+}
+
+fun stringToPercent(value: String): Double {
+    return value.formatAsDecimal().toDoubleOrNull() ?: 0.0
 }
 

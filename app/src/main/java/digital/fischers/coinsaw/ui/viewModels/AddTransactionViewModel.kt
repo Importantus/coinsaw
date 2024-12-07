@@ -63,7 +63,7 @@ class AddTransactionViewModel @Inject constructor(
         if (args.amount != null) {
             setAmount(args.amount)
         } else {
-            setAmount("0.00")
+            setAmount(0.0)
         }
     }
 
@@ -87,13 +87,13 @@ class AddTransactionViewModel @Inject constructor(
         _newTransactionState.value = _newTransactionState.value.copy(payerId = userId)
     }
 
-    fun setAmount(amount: String) {
+    fun setAmount(amount: Double) {
         _newTransactionState.value = _newTransactionState.value.copy(amount = amount)
     }
 
     private fun checkIfValid(): Boolean {
         return try {
-            newTransactionState.value.amount.isNotBlank() && newTransactionState.value.amount.toDouble() > 0
+            newTransactionState.value.amount > 0
         } catch (e: NumberFormatException) {
             false
         }
