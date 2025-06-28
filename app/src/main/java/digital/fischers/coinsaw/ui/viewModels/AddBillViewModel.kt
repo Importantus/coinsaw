@@ -203,6 +203,11 @@ class AddBillViewModel @Inject constructor(
                 )
             }
         ))
+
+        // Reset all fields
+        _newBillState.value = CreateUiStates.Bill()
+        splittings.value = emptyList()
+
         loading = false
     }
 }
