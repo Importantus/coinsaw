@@ -1,6 +1,6 @@
 package digital.fischers.coinsaw.ui.bill
 
-import android.icu.text.DecimalFormat
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +71,11 @@ fun AddBillScreen(
     onForwardNavigation: (String) -> Unit,
     viewModel: AddBillViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        Log.d("AddBillScreen", "LaunchedEffect")
+        viewModel.initialize()
+    }
+
     val horizontalPadding = 16
     val groupId = viewModel.groupId
     val group by viewModel.group.collectAsState()
@@ -343,7 +348,14 @@ fun SplittingElement(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 BasicTextField(
-                    value = percentToString(splitting.percentage, if(textBoxFocused.value) "" else String.format(Locale.getDefault(), "%.2f", 0.00)),
+                    value = percentToString(
+                        splitting.percentage,
+                        if (textBoxFocused.value) "" else String.format(
+                            Locale.getDefault(),
+                            "%.2f",
+                            0.00
+                        )
+                    ),
                     singleLine = true,
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
