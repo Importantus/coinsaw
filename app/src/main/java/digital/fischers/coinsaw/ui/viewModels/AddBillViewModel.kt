@@ -1,15 +1,12 @@
 package digital.fischers.coinsaw.ui.viewModels
 
-import android.icu.text.DecimalFormat
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import digital.fischers.coinsaw.data.database.User
@@ -18,18 +15,15 @@ import digital.fischers.coinsaw.domain.repository.GroupRepository
 import digital.fischers.coinsaw.domain.repository.UserRepository
 import digital.fischers.coinsaw.ui.Screen
 import digital.fischers.coinsaw.ui.utils.CreateUiStates
-import digital.fischers.coinsaw.ui.utils.formatAsDecimal
 import digital.fischers.coinsaw.ui.utils.roundHalfUp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
-import kotlin.math.min
 
 @HiltViewModel
 class AddBillViewModel @Inject constructor(
@@ -62,7 +56,11 @@ class AddBillViewModel @Inject constructor(
     private var _newBillState = MutableStateFlow(CreateUiStates.Bill())
     val newBillState = _newBillState.asStateFlow()
 
-    init {
+    fun initialize() {
+        // Reset
+        _newBillState.value = CreateUiStates.Bill()
+        splittings.value = emptyList()
+
         viewModelScope.launch {
             userRepository.getUsersByGroupIdAndIsDeletedStream(groupId, false).firstOrNull()
                 ?.let { users ->
@@ -133,9 +131,9 @@ class AddBillViewModel @Inject constructor(
 
     fun onSplittingChanged(userId: String, value: Double) {
         var percentage = value
-        if(percentage < 0.0) {
+        if (percentage < 0.0) {
             percentage = 0.0
-        } else if(percentage > 100.0) {
+        } else if (percentage > 100.0) {
             percentage = 100.0
         }
 
@@ -147,17 +145,19 @@ class AddBillViewModel @Inject constructor(
         val editedSplittings = newSplittings.filter { it.edited }
         val editedSum = editedSplittings.sumOf { it.percentage }
 
-        val remainingSplittings = newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
+        val remainingSplittings =
+            newSplittings.filter { !it.edited && it.percentage >= 0.0 && it.percentage <= 100.0 }
         val remainingSum = 100.0 - editedSum
 
-        if(remainingSplittings.isNotEmpty()) {
+        if (remainingSplittings.isNotEmpty()) {
             val remainingPerUser = remainingSum / remainingSplittings.size
             // Round to 2 decimal places
             val remainingPerUserRounded = remainingPerUser.roundHalfUp(2)
 
             newSplittings.forEachIndexed { i, splitting ->
                 if (!splitting.edited) {
-                    newSplittings[i] = splitting.copy(percentage = if(remainingPerUserRounded <= 0) 0.0 else remainingPerUserRounded)
+                    newSplittings[i] =
+                        splitting.copy(percentage = if (remainingPerUserRounded <= 0) 0.0 else remainingPerUserRounded)
                 }
             }
         }
@@ -165,7 +165,8 @@ class AddBillViewModel @Inject constructor(
         splittings.value = newSplittings
 
         val percentageSum = splittings.value.sumOf { it.percentage }
-        percentRemaining = if(100.0 - splittings.value.sumOf { it.percentage } > (-0.1)) abs(100.0 - percentageSum) else 100.0 - percentageSum
+        percentRemaining =
+            if (100.0 - splittings.value.sumOf { it.percentage } > (-0.1)) abs(100.0 - percentageSum) else 100.0 - percentageSum
 
         checkIfValid()
     }
@@ -179,7 +180,10 @@ class AddBillViewModel @Inject constructor(
             false
         }
 
-        Log.d("AddBillViewModel", "checkIfValid: ${checkIfSplittingIs100Percent()} $nameIsValid $amountIsValid")
+        Log.d(
+            "AddBillViewModel",
+            "checkIfValid: ${checkIfSplittingIs100Percent()} $nameIsValid $amountIsValid"
+        )
 
         valid = checkIfSplittingIs100Percent() && nameIsValid && amountIsValid
     }
@@ -195,7 +199,8 @@ class AddBillViewModel @Inject constructor(
             loading = false
             return
         }
-        billRepository.createBill(groupId, newBillState.value.copy(
+        billRepository.createBill(
+            groupId, newBillState.value.copy(
             splitting = splittings.value.map {
                 CreateUiStates.Splitting(
                     userId = it.userId,
@@ -203,10 +208,6 @@ class AddBillViewModel @Inject constructor(
                 )
             }
         ))
-
-        // Reset all fields
-        _newBillState.value = CreateUiStates.Bill()
-        splittings.value = emptyList()
 
         loading = false
     }
