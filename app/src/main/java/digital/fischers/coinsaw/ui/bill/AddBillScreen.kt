@@ -308,10 +308,12 @@ fun SplittingElement(
             .height(60.dp)
             .background(MaterialTheme.colorScheme.surface)
             .alpha(if (splitting.edited) 1f else 0.5f)
-            .pointerInput(Unit) {
-                detectDragGestures { change, _ ->
-                    val newPercentage = (change.position.x / size.width).coerceIn(0f, 1f)
-                    onSplittingChanged(splitting.userId, newPercentage.toDouble() * 100)
+            .pointerInput(totalAmount) {
+                if (totalAmount != 0.0) {
+                    detectDragGestures { change, _ ->
+                        val newPercentage = (change.position.x / size.width).coerceIn(0f, 1f)
+                        onSplittingChanged(splitting.userId, newPercentage.toDouble() * 100)
+                    }
                 }
             }
     ) {
@@ -343,6 +345,7 @@ fun SplittingElement(
                 valueTransform = { it },
                 valueFormatter = { it.asPercent() },
                 trailingText = "%",
+                disabled = totalAmount == 0.0
             )
             SplittingEditText(
                 interactionSource = interactionSource,
@@ -354,6 +357,7 @@ fun SplittingElement(
                 },
                 valueFormatter = { it.asPercent(totalAmount) },
                 trailingText = currency,
+                disabled = totalAmount == 0.0
             )
         }
     }
@@ -369,6 +373,7 @@ fun SplittingEditText(
     valueTransform: (Double) -> Double,
     valueFormatter: (String) -> Double,
     trailingText: String,
+    disabled: Boolean = false,
 ) {
     val textBoxFocused = remember { mutableStateOf(false) }
     Row(
@@ -391,6 +396,7 @@ fun SplittingEditText(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         BasicTextField(
+            enabled = !disabled,
             value = valueTransform(splitting.percentage).valueToString(
                 if (textBoxFocused.value) "" else String.format(
                     Locale.getDefault(),
