@@ -437,7 +437,8 @@ fun Double.valueToString(nullValue: String = ""): String {
 }
 
 fun String.asPercent(totalAmount: Double): Double {
-    return (formatAsDecimal().toDoubleOrNull() ?: 0.0) * 100 / totalAmount
+    return if (totalAmount == 0.0) 0.0
+    else (formatAsDecimal().toDoubleOrNull() ?: 0.0) * 100 / totalAmount
 }
 
 fun String.asPercent(): Double {
