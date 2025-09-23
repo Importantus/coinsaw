@@ -69,7 +69,7 @@ import java.util.Locale
 fun AddBillScreen(
     onBackNavigation: (String) -> Unit,
     onForwardNavigation: (String) -> Unit,
-    viewModel: AddBillViewModel = hiltViewModel()
+    viewModel: AddBillViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(Unit) {
         Log.d("AddBillScreen", "LaunchedEffect")
@@ -79,6 +79,7 @@ fun AddBillScreen(
     val horizontalPadding = 16
     val groupId = viewModel.groupId
     val group by viewModel.group.collectAsState()
+    val currency = group?.currency ?: "€"
 
     val users by viewModel.users.collectAsState()
     val valid = viewModel.valid
@@ -166,7 +167,7 @@ fun AddBillScreen(
 
                     MoneyInput(onValueChanged = {
                         viewModel.onAmountChanged(it)
-                    }, value = state.amount, currency = group?.currency ?: "€")
+                    }, value = state.amount, currency = currency)
                     TitleInput(onValueChanged = {
                         viewModel.onNameChanged(it)
                     }, value = state.name)
@@ -187,18 +188,19 @@ fun AddBillScreen(
                     resetSplittings = {
                         viewModel.resetSplittings()
                     },
-                    percentRemaining = remainingPercentage
+                    percentRemaining = remainingPercentage,
+                    totalAmount = state.amount,
+                    currency = currency
                 )
             }
         }
-
     }
 }
 
 @Composable
 fun TitleInput(
     onValueChanged: (String) -> Unit,
-    value: String
+    value: String,
 ) {
     Box {
         BasicTextField(
@@ -241,7 +243,9 @@ fun SplittingSection(
     splittings: List<TempSplitting>,
     resetSplittings: () -> Unit,
     onSplittingChanged: (String, Double) -> Unit,
-    percentRemaining: Double
+    percentRemaining: Double,
+    currency: String,
+    totalAmount: Double,
 ) {
     Column {
         Row(
@@ -270,7 +274,9 @@ fun SplittingSection(
                 SplittingElement(
                     users = users,
                     splitting = it,
-                    onSplittingChanged = onSplittingChanged
+                    totalAmount = totalAmount,
+                    currency = currency,
+                    onSplittingChanged = onSplittingChanged,
                 )
             }
         }
@@ -281,14 +287,14 @@ fun SplittingSection(
 fun SplittingElement(
     users: List<User>,
     splitting: TempSplitting,
-    onSplittingChanged: (String, Double) -> Unit
+    totalAmount: Double,
+    currency: String,
+    onSplittingChanged: (String, Double) -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     val interactionSource = remember {
         MutableInteractionSource()
     }
-
-    val textBoxFocused = remember { mutableStateOf(false) }
 
     val animatedWidth by animateFloatAsState(
         targetValue = splitting.percentage.toFloat() / 100,
@@ -302,10 +308,12 @@ fun SplittingElement(
             .height(60.dp)
             .background(MaterialTheme.colorScheme.surface)
             .alpha(if (splitting.edited) 1f else 0.5f)
-            .pointerInput(Unit) {
-                detectDragGestures { change, _ ->
-                    val newPercentage = (change.position.x / size.width).coerceIn(0f, 1f)
-                    onSplittingChanged(splitting.userId, newPercentage.toDouble() * 100)
+            .pointerInput(totalAmount) {
+                if (totalAmount != 0.0) {
+                    detectDragGestures { change, _ ->
+                        val newPercentage = (change.position.x / size.width).coerceIn(0f, 1f)
+                        onSplittingChanged(splitting.userId, newPercentage.toDouble() * 100)
+                    }
                 }
             }
     ) {
@@ -327,76 +335,119 @@ fun SplittingElement(
         ) {
             Text(
                 text = users.find { it.id == splitting.userId }?.name ?: "",
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp),
             )
-            Row(
-                modifier = Modifier
-                    .width(60.dp)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = getBottomLineShape(1.dp)
-                    )
-                    .clip(MaterialTheme.shapes.medium)
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null,
-                    ) {
-                        focusRequester.requestFocus()
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BasicTextField(
-                    value = percentToString(
-                        splitting.percentage,
-                        if (textBoxFocused.value) "" else String.format(
-                            Locale.getDefault(),
-                            "%.2f",
-                            0.00
-                        )
-                    ),
-                    singleLine = true,
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    textStyle = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 16.sp
-                    ),
-                    onValueChange = { onSplittingChanged(splitting.userId, stringToPercent(it)) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .onFocusChanged {
-                            textBoxFocused.value = it.isFocused
-                        }
-                        .focusRequester(focusRequester)
-                )
-
-                Text(
-                    modifier = Modifier
-                        .padding(4.dp),
-                    text = "%",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 16.sp
-                    )
-                )
-            }
+            SplittingEditText(
+                interactionSource = interactionSource,
+                focusRequester = focusRequester,
+                splitting = splitting,
+                onSplittingChanged = onSplittingChanged,
+                valueTransform = { it },
+                valueFormatter = { it.asPercent() },
+                trailingText = "%",
+                disabled = totalAmount == 0.0
+            )
+            SplittingEditText(
+                interactionSource = interactionSource,
+                focusRequester = focusRequester,
+                splitting = splitting,
+                onSplittingChanged = onSplittingChanged,
+                valueTransform = { percentValue ->
+                    totalAmount * percentValue / 100
+                },
+                valueFormatter = { it.asPercent(totalAmount) },
+                trailingText = currency,
+                disabled = totalAmount == 0.0
+            )
         }
     }
 }
 
-fun percentToString(value: Double, nullValue: String = ""): String {
-    return if (value == 0.0) {
-        nullValue
-    } else {
-        String.format(Locale.getDefault(), "%.2f", value)
+
+@Composable
+fun SplittingEditText(
+    interactionSource: MutableInteractionSource,
+    focusRequester: FocusRequester,
+    splitting: TempSplitting,
+    onSplittingChanged: (String, Double) -> Unit,
+    valueTransform: (Double) -> Double,
+    valueFormatter: (String) -> Double,
+    trailingText: String,
+    disabled: Boolean = false,
+) {
+    val textBoxFocused = remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .width(60.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onSurface,
+                shape = getBottomLineShape(1.dp),
+            )
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = {
+                    focusRequester.requestFocus()
+                },
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        BasicTextField(
+            enabled = !disabled,
+            value = valueTransform(splitting.percentage).valueToString(
+                if (textBoxFocused.value) "" else String.format(
+                    Locale.getDefault(),
+                    "%.2f",
+                    0.00
+                )
+            ),
+            singleLine = true,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            textStyle = TextStyle(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+            ),
+            onValueChange = { onSplittingChanged(splitting.userId, valueFormatter(it)) },
+            modifier = Modifier
+                .weight(1f)
+                .onFocusChanged {
+                    textBoxFocused.value = it.isFocused
+                }
+                .focusRequester(focusRequester),
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(4.dp),
+            text = trailingText,
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Light,
+                fontSize = 16.sp,
+            )
+        )
     }
 }
 
-fun stringToPercent(value: String): Double {
-    return value.formatAsDecimal().toDoubleOrNull() ?: 0.0
+
+fun Double.valueToString(nullValue: String = ""): String {
+    return when(this) {
+        0.0 -> nullValue
+        else -> String.format(Locale.getDefault(), format = "%.2f", this)
+    }
+}
+
+fun String.asPercent(totalAmount: Double): Double {
+    return if (totalAmount == 0.0) 0.0
+    else (formatAsDecimal().toDoubleOrNull() ?: 0.0) * 100 / totalAmount
+}
+
+fun String.asPercent(): Double {
+    return formatAsDecimal().toDoubleOrNull() ?: 0.0
 }
 
