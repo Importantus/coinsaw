@@ -121,4 +121,6 @@
     <string name="notification_new_bill_message">%1$s hat %2$s für „%3$s“ bezahlt</string>
     <string name="channel_changelog">Gruppenereignisse</string>
     <string name="channel_changelog_description">Benachrichtigungen über neue Ausgaben, Mitglieder oder Änderungen an der Gruppenkonfiguration</string>
+    <string name="delete_member_title">Lösche Nutzer</string>
+    <string name="delete_member_description">Möchtest du %1$s wirklich entfernen? Die bisherigen Transaktionen bleiben bestehen.</string>
 </resources>

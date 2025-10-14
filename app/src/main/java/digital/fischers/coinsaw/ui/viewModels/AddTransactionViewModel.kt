@@ -17,6 +17,8 @@ import digital.fischers.coinsaw.ui.utils.CreateUiStates
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -38,9 +40,34 @@ class AddTransactionViewModel @Inject constructor(
     var error by mutableStateOf<Boolean>(false)
         private set
 
-    val users = userRepository.getUsersByGroupIdAndIsDeletedStream(groupId, false).stateIn(
-        scope = viewModelScope, started = WhileSubscribed(5_000L), initialValue = emptyList()
-    )
+    val users = userRepository.getUsersByGroupIdAndIsDeletedStream(groupId, false)
+        .map { activeUsers ->
+            // Add payer and payee to the list, if they aren't already (e.g. if they were deleted)
+            val userList = activeUsers.toMutableList()
+            val allUserIds = userList.map { it.id }.toSet()
+
+            args.payerId?.let { payerId ->
+                if (payerId !in allUserIds) {
+                    userRepository.getUserStream(payerId).firstOrNull()?.let { user ->
+                        userList.add(user)
+                    }
+                }
+            }
+
+            args.payeeId?.let { payeeId ->
+                if (payeeId !in userList.map { it.id }.toSet()) {
+                    userRepository.getUserStream(payeeId).firstOrNull()?.let { user ->
+                        userList.add(user)
+                    }
+                }
+            }
+            userList.toList()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
 
     private var _newTransactionState = MutableStateFlow(CreateUiStates.Bill())
     val newTransactionState = _newTransactionState.asStateFlow()

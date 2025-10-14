@@ -14,8 +14,14 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE id = :id")
     fun getById(id: String): Flow<User>
 
+    @Query("SELECT * FROM user WHERE id = :id AND isDeleted = :isDeleted")
+    fun getByIdAnIsDeleted(id: String, isDeleted: Boolean = false): Flow<User>
+
     @Query("SELECT * FROM user WHERE name = :name")
     fun getByName(name: String): Flow<User>
+
+    @Query("SELECT * FROM user WHERE name = :name AND isDeleted = :isDeleted")
+    fun getByNameAndIsDeleted(name: String, isDeleted: Boolean = false): Flow<User>
 
     @Query("SELECT * FROM user WHERE groupId = :groupId AND isMe = :isMe")
     fun getByGroupIdAndIsMe(groupId: String, isMe: Boolean): Flow<User?>
