@@ -8,7 +8,7 @@ data class HomeGroupUiState(
     val members: Number,
     val online: Boolean,
     val lastSync: Long?,
-    val balance: Double,
+    val balance: Double?,
     val currency: String,
     val lastTransactions: Flow<List<HomeTransactionUiState>>
 )

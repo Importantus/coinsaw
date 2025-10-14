@@ -32,10 +32,11 @@ class HomeViewModel @Inject constructor(
             val members = userRepository.getAllUsersByGroupIdStream(group.id).firstOrNull()?.count()
                 ?: 0
 
-            val balance = calculatedTransactionRepository.getTotalBalanceByGroupIdAndUserId(
-                group.id,
-                me?.id ?: ""
-            ).firstOrNull() ?: 0.0
+            val balance =
+                if (me != null) calculatedTransactionRepository.getTotalBalanceByGroupIdAndUserId(
+                    group.id,
+                    me.id
+                ).firstOrNull() ?: 0.0 else null
 
             val lastTransactions = billRepository.getBillsByGroupAndIsDeletedStream(
                 group.id,
