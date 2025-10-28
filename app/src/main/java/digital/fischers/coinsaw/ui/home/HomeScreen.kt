@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -58,7 +57,9 @@ fun HomeScreen(
             Column {
                 Text(
                     text = stringResource(id = R.string.screen_title_groups), style = TextStyle(
-                        fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.neutral
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.neutral
                     )
                 )
             }
@@ -116,7 +117,8 @@ fun HomeScreen(
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                         ActionButtonRow(
-                            onGroupAddClicked = onGroupAddClicked, onGroupJoinClicked = onGroupJoinClicked
+                            onGroupAddClicked = onGroupAddClicked,
+                            onGroupJoinClicked = onGroupJoinClicked
                         )
                         Spacer(modifier = Modifier.height(32.dp))
                     }
@@ -192,12 +194,13 @@ fun ActionButton(
 fun GroupCard(
     groupUiState: HomeGroupUiState, onClick: (String) -> Unit
 ) {
-    Column(modifier = Modifier
-        .clip(MaterialTheme.shapes.medium)
-        .clickable { onClick(groupUiState.id) }
-        .fillMaxWidth()
-        .background(MaterialTheme.colorScheme.surface)
-        .padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable { onClick(groupUiState.id) }
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,7 +209,9 @@ fun GroupCard(
             Column {
                 Text(
                     text = groupUiState.name, style = TextStyle(
-                        fontSize = 20.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.neutral
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.neutral
                     )
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -228,29 +233,31 @@ fun GroupCard(
                     )
                 )
             }
-            Box(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.small)
-                    .background(
-                        when {
-                            groupUiState.balance > 0.009 -> MaterialTheme.colorScheme.secondaryContainer
-                            groupUiState.balance < 0.000 -> MaterialTheme.colorScheme.error
-                            else -> MaterialTheme.colorScheme.secondary
-                        }
-                    )
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = "${
-                        String.format(
-                            Locale.getDefault(), "%.2f", groupUiState.balance
+            if (groupUiState.balance != null) {
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(
+                            when {
+                                groupUiState.balance > 0.009 -> MaterialTheme.colorScheme.secondaryContainer
+                                groupUiState.balance < 0.000 -> MaterialTheme.colorScheme.error
+                                else -> MaterialTheme.colorScheme.secondary
+                            }
                         )
-                    } ${groupUiState.currency}", style = TextStyle(
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.surface
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "${
+                            String.format(
+                                Locale.getDefault(), "%.2f", groupUiState.balance
+                            )
+                        } ${groupUiState.currency}", style = TextStyle(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.surface
+                        )
                     )
-                )
+                }
             }
         }
     }

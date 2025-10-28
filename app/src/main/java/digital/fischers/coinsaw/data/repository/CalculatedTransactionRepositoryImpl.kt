@@ -4,12 +4,11 @@ import digital.fischers.coinsaw.data.database.BillDao
 import digital.fischers.coinsaw.data.database.CalculatedTransaction
 import digital.fischers.coinsaw.data.database.CalculatedTransactionDao
 import digital.fischers.coinsaw.data.util.calculateTransactions
-import digital.fischers.coinsaw.domain.repository.BillRepository
 import digital.fischers.coinsaw.domain.repository.CalculatedTransactionRepository
+import digital.fischers.coinsaw.ui.utils.roundHalfUp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
 import javax.inject.Inject
 
 class CalculatedTransactionRepositoryImpl @Inject constructor(
@@ -28,16 +27,16 @@ class CalculatedTransactionRepositoryImpl @Inject constructor(
         groupId: String,
         userId: String
     ): Flow<Double> {
-        return billDao.getAllBillsByGroupAndIsDeleted(groupId, isDeleted = false)
-            .map { bills ->
-                return@map bills.map { bill ->
-                    if (bill.userId == userId) {
-                        bill.amount - ((bill.amount * (bill.splittings.find { it.userId == userId }?.percent ?: 0.0)))
+        return getAllByGroupIdStream(groupId).map { transactions ->
+            transactions.filter { it.payerId == userId || it.payeeId == userId }
+                .fold(0.0) { acc, transaction ->
+                    if (transaction.payerId == userId) {
+                        acc - transaction.amount
                     } else {
-                        0.0 - bill.amount * (bill.splittings.find { it.userId == userId }?.percent ?: 0.0)
+                        acc + transaction.amount
                     }
-                }.sumOf { it }
-            }
+                }.roundHalfUp()
+        }
     }
 
     override suspend fun calculateForGroup(groupId: String) {
