@@ -52,16 +52,6 @@ class EditMemberViewModel @Inject constructor(
     var loading by mutableStateOf(true)
         private set
 
-    suspend fun deleteUser() {
-        userRepository.updateUser(
-            groupId = groupId,
-            Payload.User(
-                id = userId,
-                isDeleted = true
-            )
-        )
-    }
-
     private fun checkIfNameIsValid(name: String): Boolean {
         return name.isNotBlank() && name.length > 2 && name.length < 75
     }
@@ -82,14 +72,26 @@ class EditMemberViewModel @Inject constructor(
         loading = false
     }
 
+    suspend fun deleteUser() {
+        loading = true
+        userRepository.updateUser(
+            groupId = groupId,
+            Payload.User(
+                id = userId,
+                isDeleted = true
+            )
+        )
+        loading = false
+    }
+
     private suspend fun updateIsMe() {
-        if(isMe != oldState?.isMe) {
+        if (isMe != oldState?.isMe) {
             userRepository.setUserAsMe(groupId, userId, isMe)
         }
     }
 
     private suspend fun updateUser() {
-        if(userName != oldState?.name) {
+        if (userName != oldState?.name) {
             userRepository.updateUser(
                 groupId = groupId,
                 Payload.User(
